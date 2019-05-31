@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: htmlhead" th:with="title='favorites'"></head>
+<style>
+    .layui-table, .layui-table-view {
+        margin: 0px;
+
+    }
+</style>
+<body>
+<div class="demoTable">
+    请输入姓名：
+    <div class="layui-inline">
+        <input class="layui-input" name="userName" id="demoReload" autocomplete="off">
+    </div>
+    <div class="layui-inline">
+        <label class="layui-form-label">请选择范围</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="searchTime" placeholder="开始 到 结束">
+        </div>
+    </div>
+    <button class="layui-btn" data-type="reload">搜索</button>
+    <div class="layui-btn-group demoTable" style="float: right">
+        <button class="layui-btn" data-type="getCheckData">获取选中行数据</button>
+        <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
+        <button class="layui-btn" data-type="isAll">验证是否全选</button>
+        <button class="layui-btn" data-type="open" id = "open">打卡设置</button>
+    </div>
+</div>
+<table class="layui-hide" id="test" lay-filter="demo"></table>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+    <!-- 内容主体区域 -->
+    <script type="text/javascript" th:src="@{/js/dateUtils.js}"></script>
+    <script type="text/javascript" th:src="@{/js/viewjs/list.js}"></script>
+    <script type="text/javascript" th:src="@{/js/error.js}"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: htmlhead" th:with="title='favorites'"></head>
+<body>
+    <section th:fragment="content">
+        <div class="layui-container">
+            <div class="layui-row">
+                <div class="layui-col-xs9">
+                    &nbsp;
+                    <h1 style="padding-top:50px;line-height:2.0;"><!--<shiro:principal property="sysUserName"></shiro:principal>，-->欢迎登录
+                        <span style="font-weight: bold;font-size:28px;">德一集团后台管理系统</span></a></h1>
+                </div>
+            </div>
+        </div>
+    <script type="text/javascript" th:src="@{/js/error.js}"></script>
+    </section>
+</body>
+</html>

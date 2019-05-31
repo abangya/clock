@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.deyi.clock.dao.ClockMapper" >
+    <resultMap id="BaseResultMap" type="ClockVo">
+        <id column="clockId" jdbcType="INTEGER" property="clockId" />
+        <result column="clockPhoto" jdbcType="VARCHAR" property="clockPhoto" />
+        <result column="clockCreateTime" jdbcType="VARCHAR" property="clockCreateTime" />
+        <result column="clockIpAddress" jdbcType="VARCHAR" property="clockIpAddress" />
+        <result column="clockName" jdbcType="VARCHAR" property="clockName" />
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="userName" jdbcType="VARCHAR" property="userName" />
+        <result column="age" jdbcType="INTEGER" property="age" />
+        <result column="photo" jdbcType="VARCHAR" property="photo" />
+        <result column="clId" jdbcType="INTEGER" property="clId" />
+        <result column="level" jdbcType="INTEGER" property="level" />
+        <collection property="dimensionVoList" ofType="DimensionVo">
+            <id column="dId" jdbcType="INTEGER" property="dId" />
+            <result column="startTime" jdbcType="VARCHAR" property="startTime" />
+            <result column="endTime" jdbcType="VARCHAR" property="endTime" />
+            <result column="parentId" jdbcType="INTEGER" property="parentId" />
+            <result column="sort" jdbcType="INTEGER" property="sort" />
+        </collection>
+    </resultMap>
+    <!--人员列表-->
+    <select id="clockAllUser" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select temp.*,d.id dId,d.startTime,d.endTime,d.parentId,d.sort from (
+        select c.id clockId,c.photo clockPhoto,DATE_FORMAT(c.createTime,'%Y-%m-%d %H:%i:%S') clockCreateTime,
+        c.ipAddress clockIpAddress,c.name clockName,u.id,u.userName,u.age,u.photo,cl.id clId,cl.level
+        from clock c
+        LEFT JOIN user u on c.photo = u.photo
+        LEFT JOIN userlevel ul on ul.userId = u.id
+        LEFT JOIN clocklevel cl on cl.id = ul.levelId
+        <where>
+            <if test="userName != null &amp;&amp; userName != ''">
+                and u.userName = #{userName,jdbcType=VARCHAR}
+            </if>
+            <if test="startTime != null &amp;&amp; startTime!='' ">
+                and DATE_FORMAT(c.createTime,'%Y-%m-%d') >= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null &amp;&amp; endTime!='' ">
+                and DATE_FORMAT(c.createTime,'%Y-%m-%d') &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        GROUP BY c.photo,DATE_FORMAT(c.createTime,'%Y-%m-%d')
+        limit #{startNum},#{endNum}
+        )temp
+        LEFT JOIN dimension d on d.parentId = temp.clId
+        ORDER BY temp.clockCreateTime desc,temp.userName,d.startTime
+    </select>
+    <!--人员列表-->
+    <select id="clockAllUserCount" parameterType="ClockDto" resultType="Integer">
+        select count(1)
+        from clock c
+        left join user u on c.photo = u.photo
+        LEFT JOIN userlevel ul on ul.userId = u.id
+        LEFT JOIN clocklevel cl on cl.id = ul.levelId
+        <where>
+            <if test="userName != null &amp;&amp; userName != ''">
+                and u.userName like CONCAT('%',#{userName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="startTime != null &amp;&amp; startTime!='' ">
+                and DATE_FORMAT(c.createTime,'%Y-%m-%d') >= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null &amp;&amp; endTime!='' ">
+                and DATE_FORMAT(c.createTime,'%Y-%m-%d') &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        GROUP BY c.photo,DATE_FORMAT(c.createTime,'%Y-%m-%d')
+
+    </select>
+    <!--个人打卡记录-->
+    <select id="userClock" parameterType="ClockDto" resultType="java.util.Map">
+        select c.id,u.id userId,IFNULL(u.userName,c.name) userName,c.createTime,c.ipAddress
+        from clock c
+        left join user u on u.photo = c.photo
+        <where>
+            <if test="id != null &amp;&amp; id != ''">
+                and u.id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="searchTime != null &amp;&amp; searchTime != ''">
+                and DATE_FORMAT(c.createTime,'%Y-%m-%d') = DATE_FORMAT(#{searchTime,jdbcType=VARCHAR},'%Y-%m-%d')
+            </if>
+        </where>
+        GROUP BY DATE_FORMAT(c.createTime,'%Y-%m-%d %H:%i')
+        order by createTime
+    </select>
+
+    <select id="levelClock" parameterType="Integer" resultType="java.util.Map">
+        select ul.userId,cl.level,d.startTime,d.endTime from userlevel ul
+        LEFT JOIN clocklevel cl on ul.levelId = cl.id
+        LEFT JOIN dimension d on d.parentId = cl.id
+        where ul.userId = #{userId,jdbcType=VARCHAR}
+    </select>
+</mapper>
