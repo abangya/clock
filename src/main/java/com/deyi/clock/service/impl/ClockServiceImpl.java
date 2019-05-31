@@ -44,12 +44,12 @@ public class ClockServiceImpl implements ClockService {
     public List<Map<String, Object>> userClock(ClockDto clockDto) {
 
         //正常打卡次数
-        List<Map<String, Object>> levelClock = this.levelClock(clockDto.getId());
-        //人员打卡记录
-        List<Map<String, Object>> mapList = clockMapper.userClock(clockDto);
-        String endClockStr = "";//上一次记录时间
-        String endStr = "";//上一次区间结束时间
-        for (int i = 0;i<levelClock.size();i++){
+            List<Map<String, Object>> levelClock = this.levelClock(clockDto.getId());
+            //人员打卡记录
+            List<Map<String, Object>> mapList = clockMapper.userClock(clockDto);
+            String endClockStr = "";//上一次记录时间
+            String endStr = "";//上一次区间结束时间
+            for (int i = 0;i<levelClock.size();i++){
             //本次区间正常打卡时间
             String startTime = levelClock.get(i).get("startTime").toString();
             String endTime = levelClock.get(i).get("endTime").toString();
@@ -95,15 +95,16 @@ public class ClockServiceImpl implements ClockService {
                 }
                 //下班打卡
                 if(EmptyUtils.isNotEmpty(levelClock.get(i).get("workTime"))){
-//                    //早退打卡时间
-//                    if(DateUtils.compTime(createTime,startTime) && !DateUtils.compTime(createTime,endTime)){
-//                        if(!mapList.get(j).get("createTime").toString().equals(levelClock.get(i).get("workTime").toString())){
-//                            levelClock.get(i).put("afterTime",mapList.get(j).get("createTime"));
-//                            levelClock.get(i).put("afterTimeMsg","早退");
-//                            //更新打卡时间
-//                            endClockStr = mapList.get(j).get("createTime").toString();
-//                        }
-//                    }
+                    //早退打卡时间
+                    if(DateUtils.compTime(createTime,startTime) && !DateUtils.compTime(createTime,endTime)){
+                        if(!mapList.get(j).get("createTime").toString().equals(levelClock.get(i).get("workTime").toString())){
+                            levelClock.get(i).put("afterTime",mapList.get(j).get("createTime"));
+                            levelClock.get(i).put("afterTimeMsg","早退");
+                            //更新打卡时间
+                            endClockStr = mapList.get(j).get("createTime").toString();
+                        }
+                    }
+                    //正常打卡时间
                     if(DateUtils.compTime(createTime,endTime)){
                         //判断是否有下个区间
                         if( i < levelClock.size()-1){
@@ -132,6 +133,7 @@ public class ClockServiceImpl implements ClockService {
                         }
                     }
                 }/*else{
+                     //上班忘记打卡
                     if(DateUtils.compTime(createTime,endTime)){
                         for(int l = levelClock.size()-1;l>=0;l--){
                             if(DateUtils.compTime(createTime,levelClock.get(l).get("endTime").toString())){
