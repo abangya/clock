@@ -3,7 +3,13 @@ package com.deyi.clock;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/*@SpringBootApplication 等价于以默认属性使用 @Configuration ， @EnableAutoConfiguration 和 @ComponentScan， 所以启动类无需再添加这三个注解
+@Configuration ： 标注一个类为配置类。
+@EnableAutoConfiguration ：开启自动配置。
+@ComponentScan ：自动收集所有的 Spring 组件*/
+@EnableTransactionManagement
 @SpringBootApplication
 @MapperScan("com.deyi.clock.dao")
 public class DeyiClockApplication {

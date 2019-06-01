@@ -1,63 +1,19 @@
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false
-    username: root
-    password: root
-    port: 3306
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    type: com.alibaba.druid.pool.DruidDataSource
-    druid:
-      initialSize: 5
-      minIdle: 5
-      maxActive: 20
-      maxWait: 60000
-      timeBetweenEvictionRunsMillis: 60000
-      minEvictableIdleTimeMillis: 300000
-      validationQuery: SELECT 1 FROM DUAL
-      testWhileIdle: true
-      testOnBorrow: false
-      testOnReturn: false
-      filters: stat,wall
-      poolPreparedStatements: true
-      maxPoolPreparedStatementPerConnectionSize: 20
-      connectionProperties: "druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000"
-      aop-patterns: "com.deyi.clock.service.*,com.deyi.clock.service.serviceImpl.*,com.deyi.clock.controller.*,com.deyi.clock.dao.*"
-      stat-view-servlet.reset-enable: false
-      web-stat-filter:
-        enabled: true
-        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*,/logout"
-        session-stat-enable: true
-        session-stat-max-count: 100
-        sessionStatEnable: true
-        principal-session-name: "user"
-        principal-cookie-name: "sid"
-      stat-view-servlet:
-        allow: 127.0.0.1
-        enabled: true
-        url-pattern: /druid/*
-        reset-enable: false
-        login-username: admin
-        login-password: 123456
-      filter:
-        filter:
-          enabled: true
-          statement-create-after-log-enabled: false
-          statement-close-after-log-enabled: false
-          result-set-open-after-log-enabled: false
-          result-set-close-after-log-enabled: false
-  devtools:
-    restart:
-      enabled: true
-      exclude: static/**
-      additional-paths: src/main/java
-  thymeleaf:
-    mode: HTML5
-    encoding: UTF-8
-    cache: false
-    prefix: classpath:/templates/
-    servlet:
-      content-type: text/html
-    suffix: .html
+  profiles:
+    active: @profileActive@
+  #aop注解注意：proxy-target-class属性值决定是基于接口的还是基于类的代理被创建。
+  #如果proxy-target-class 属性值被设置为true，那么基于类的代理将起作用（这时需要cglib库）。
+  #如果proxy-target-class属值被设置为false或者这个属性被省略，那么标准的JDK 基于接口的代理。
+  #如果不给出 proxy-target-class，就按 proxy-target-class=“false”对待，也即是按JDK proxy来处理的。
+  aop:
+    #添加@EnableAspectJautoProxy。
+    auto: true
+    #true表示基于类的代理将使用,false表示默认使用Jdk基于接口的代理
+    proxy-target-class: true
+    #spring.jmx是默认打开的每个jmx名字必须是唯一的
+  jmx:
+    default-domain: deyi_clock
+
 mybatis:
   configuration:
     call-setters-on-nulls: true
@@ -66,6 +22,7 @@ mybatis:
   type-aliases-package: com.deyi.clock.domain
   config-locations: classpath*:mybatis-config.xml
   mapper-locations: classpath*:com/deyi/clock/dao/mapper/*.xml
+
 #pagehelper
 pagehelper:
   offsetAsPageNum: true
@@ -80,6 +37,7 @@ pagehelper:
   params: count=countSql
   #当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
   page-size-zero: true
+
 logging:
   level:
     com.deyi.clock.dao: DEBUG

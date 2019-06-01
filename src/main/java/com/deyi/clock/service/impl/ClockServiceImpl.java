@@ -47,7 +47,6 @@ public class ClockServiceImpl implements ClockService {
         //人员打卡记录
         List<Map<String, Object>> clockMapList = clockMapper.userClock(clockDto);
         String workClockTime = "";
-        String worClockEndTime = "";
         //上次区间结束值
         String levelTimeEndStr = "";
         for (int i = 0;i< levelClockList.size();i++) {
@@ -124,8 +123,19 @@ public class ClockServiceImpl implements ClockService {
                         //判断是否有下次区间
                         if(i<levelClockList.size()-1){
                             if(EmptyUtils.isNotEmpty(levelClockList.get(i).get("afterTime"))){
-                                workClockTime = levelClockList.get(i).get("afterTime").toString();
-                                break;
+                                //更新下班打卡时间，防止无意早退卡
+                                if(DateUtils.compTime(levelClockList.get(i+1).get("startTime").toString(),createTime)){
+                                    if(DateUtils.compTime(DateUtils.HourMinuteSecond(levelClockList.get(i).get("afterTime").toString()),endTime) ){
+                                        workClockTime = levelClockList.get(i).get("afterTime").toString();
+                                        break;
+                                    }
+                                    levelClockList.get(i).put("afterTime",clockTime);
+                                    levelClockList.get(i).put("afterTimeMsg","正常打卡");
+                                    workClockTime = clockTime;
+                                }else{
+                                    workClockTime = levelClockList.get(i).get("afterTime").toString();
+                                    break;
+                                }
                             }else{
                                 levelClockList.get(i).put("afterTime",clockTime);
                                 levelClockList.get(i).put("afterTimeMsg","正常打卡");
