@@ -94,7 +94,7 @@ layui.use(['table','element'], function(){
                                                 return "<span style='color:red'>"+row.workTimeMsg+"</span>";
                                             }
                                             var str = '';
-                                            if("打卡成功"==row.workTimeMsg){
+                                            if("正常打卡"==row.workTimeMsg){
                                                 str = "(<span style='color:green'>"+row.workTimeMsg+"</span>)";
                                             }else{
                                                 str = "(<span style='color:red'>"+row.workTimeMsg+"</span>)";
@@ -110,7 +110,7 @@ layui.use(['table','element'], function(){
                                                 return "<span style='color:red'>"+row.afterTimeMsg+"</span>";
                                             }
                                             var str = '';
-                                            if("打卡成功"==row.afterTimeMsg){
+                                            if("正常打卡"==row.afterTimeMsg){
                                                 str = "(<span style='color:green'>"+row.afterTimeMsg+"</span>)";
                                             }else{
                                                 str = "(<span style='color:red'>"+row.afterTimeMsg+"</span>)";

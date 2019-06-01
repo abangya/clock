@@ -6,6 +6,7 @@ import com.deyi.clock.domain.vo.ClockVo;
 import com.deyi.clock.service.ClockService;
 import com.deyi.clock.utils.DateUtils;
 import com.deyi.clock.utils.EmptyUtils;
+import com.deyi.clock.utils.MathUtils;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
@@ -40,113 +41,124 @@ public class ClockServiceImpl implements ClockService {
         return mapList;
     }
 
-    @Override
     public List<Map<String, Object>> userClock(ClockDto clockDto) {
-
         //正常打卡次数
-        List<Map<String, Object>> levelClock = this.levelClock(clockDto.getId());
+        List<Map<String, Object>> levelClockList = this.levelClock(clockDto.getId());
         //人员打卡记录
-        List<Map<String, Object>> mapList = clockMapper.userClock(clockDto);
-        String endClockStr = "";//上一次记录时间
-        String endStr = "";//上一次区间结束时间
-        for (int i = 0;i<levelClock.size();i++){
+        List<Map<String, Object>> clockMapList = clockMapper.userClock(clockDto);
+        String workClockTime = "";
+        String worClockEndTime = "";
+        //上次区间结束值
+        String levelTimeEndStr = "";
+        for (int i = 0;i< levelClockList.size();i++) {
             //本次区间正常打卡时间
-            String startTime = levelClock.get(i).get("startTime").toString();
-            String endTime = levelClock.get(i).get("endTime").toString();
+            String startTime = levelClockList.get(i).get("startTime").toString();
+            String endTime = levelClockList.get(i).get("endTime").toString();
 
             //初始打卡记录状态
-            levelClock.get(i).put("workTime","");
-            levelClock.get(i).put("workTimeMsg","未打卡");
-            levelClock.get(i).put("afterTime","");
-            levelClock.get(i).put("afterTimeMsg","未打卡");
+            levelClockList.get(i).put("workTime","");
+            levelClockList.get(i).put("workTimeMsg","未打卡");
+            levelClockList.get(i).put("afterTime","");
+            levelClockList.get(i).put("afterTimeMsg","未打卡");
 
-            for (int j = 0;j < mapList.size();j++){
-                //本次循环打卡时间
-                String createTime = DateUtils.HourMinuteSecond(mapList.get(j).get("createTime").toString());
-                //没有上班打卡记录
-                //上班打卡
-                if(EmptyUtils.isEmpty(levelClock.get(i).get("workTime"))){
-                    if(!DateUtils.compTime(createTime,startTime)){
-                        if(EmptyUtils.isNotEmpty(endClockStr)){
-                            //取出上一次打卡时间的时分秒
-                            //不用同一时刻打卡
-                            String endStrHHmmss = DateUtils.HourMinuteSecond(endClockStr);
-                            if(!DateUtils.compTime(createTime,startTime) && DateUtils.compTime(createTime,endStr) && DateUtils.compTime(createTime,endStrHHmmss)){
-                                //第一次正常打卡时间之前
-                                levelClock.get(i).put("workTime",mapList.get(j).get("createTime"));
-                                levelClock.get(i).put("workTimeMsg","打卡成功");
-                                //更新打卡时间
-                                endClockStr = mapList.get(j).get("createTime").toString();
+            for (Map<String,Object> clockMap:clockMapList) {
+                //本次区间正常打卡时间
+                String clockTime = clockMap.get("createTime").toString();
+                String createTime = DateUtils.HourMinuteSecond(clockMap.get("createTime").toString());
+                //最早打卡，之后不更新，
+                if(EmptyUtils.isEmpty(levelClockList.get(i).get("workTime"))){
+                    //打卡标识为空
+                    if(EmptyUtils.isEmpty(workClockTime)){
+                        if(!DateUtils.compTime(createTime,startTime)){
+                            //正常打卡
+                            levelClockList.get(i).put("workTime",clockTime);
+                            levelClockList.get(i).put("workTimeMsg","正常打卡");
+                            workClockTime = clockTime;
+                        }else{
+                            if(!DateUtils.compTime(createTime,endTime)){
+                                //区间内打卡，迟到/早退
+                                levelClockList.get(i).put("workTime",clockTime);
+                                levelClockList.get(i).put("workTimeMsg","迟到打卡");
+                                workClockTime = clockTime;
+                            }
+                        }
+                    }else{
+                        //下一次区间打卡
+                        //小于本次区间起始值
+                        if(!DateUtils.compTime(createTime,startTime)){
+                            //值大于上一次区间结束值
+                            String workClockTimeHHmmss = DateUtils.HourMinuteSecond(workClockTime);
+                            if(DateUtils.compTime(createTime,levelTimeEndStr) && DateUtils.compTime(createTime,workClockTimeHHmmss) ){
+                                //正常打卡
+                                levelClockList.get(i).put("workTime",clockTime);
+                                levelClockList.get(i).put("workTimeMsg","正常打卡");
+                                workClockTime = clockTime;
                             }
                         }else{
-                            //第一次正常打卡时间之前
-                            levelClock.get(i).put("workTime",mapList.get(j).get("createTime"));
-                            levelClock.get(i).put("workTimeMsg","打卡成功");
-                            //更新打卡时间
-                            endClockStr = mapList.get(j).get("createTime").toString();
+                            //迟到打卡
+                            if(!DateUtils.compTime(createTime,endTime)){
+                                if(EmptyUtils.isEmpty(levelClockList.get(i).get("workTime"))){
+                                    //迟到打卡
+                                    levelClockList.get(i).put("workTime",clockTime);
+                                    levelClockList.get(i).put("workTimeMsg","迟到打卡");
+                                    workClockTime = clockTime;
+                                }
+                            }
                         }
-                    }
-                    //迟到打卡时间
-                    if(DateUtils.compTime(createTime,startTime) && !DateUtils.compTime(createTime,endTime)){
-                        levelClock.get(i).put("workTime",mapList.get(j).get("createTime").toString());
-                        levelClock.get(i).put("workTimeMsg","迟到");
-                        endClockStr = mapList.get(j).get("createTime").toString();
                     }
                 }
-                //下班打卡
-                if(EmptyUtils.isNotEmpty(levelClock.get(i).get("workTime"))){
-//                    //早退打卡时间
-//                    if(DateUtils.compTime(createTime,startTime) && !DateUtils.compTime(createTime,endTime)){
-//                        if(!mapList.get(j).get("createTime").toString().equals(levelClock.get(i).get("workTime").toString())){
-//                            levelClock.get(i).put("afterTime",mapList.get(j).get("createTime"));
-//                            levelClock.get(i).put("afterTimeMsg","早退");
-//                            //更新打卡时间
-//                            endClockStr = mapList.get(j).get("createTime").toString();
-//                        }
-//                    }
+
+                if(EmptyUtils.isNotEmpty(levelClockList.get(i).get("workTime").toString())){
+                    //早退打卡
+                    if(DateUtils.compTime(endTime,createTime) && DateUtils.compTime(createTime,startTime)){
+                        String workClockTimeStr = DateUtils.HourMinuteSecond(levelClockList.get(i).get("workTime").toString());
+                        if(DateUtils.compTime(createTime,workClockTimeStr)){
+                            //早退打卡
+                            levelClockList.get(i).put("afterTime",clockTime);
+                            levelClockList.get(i).put("afterTimeMsg","早退打卡");
+                            workClockTime = clockTime;
+                        }
+                    }
+                    //大于本次区间的结束值
                     if(DateUtils.compTime(createTime,endTime)){
-                        //判断是否有下个区间
-                        if( i < levelClock.size()-1){
-                            if(EmptyUtils.isNotEmpty( levelClock.get(i).get("afterTime"))){
-                                String timeTemp = DateUtils.HourMinuteSecond(levelClock.get(i).get("afterTime").toString());
-                                //小于下个区间的起始值
-                                if(!DateUtils.compTime(timeTemp,startTime)){
-                                    if(!DateUtils.compTime(createTime,levelClock.get(i+1).get("startTime").toString())){
-                                        levelClock.get(i).put("afterTime",mapList.get(j).get("createTime"));
-                                        levelClock.get(i).put("afterTimeMsg","打卡成功");
-                                        //更新打卡时间
-                                        endClockStr = mapList.get(j).get("createTime").toString();
-                                    }
-                                }
+                        //判断是否有下次区间
+                        if(i<levelClockList.size()-1){
+                            if(EmptyUtils.isNotEmpty(levelClockList.get(i).get("afterTime"))){
+                                workClockTime = levelClockList.get(i).get("afterTime").toString();
+                                break;
                             }else{
-                                levelClock.get(i).put("afterTime",mapList.get(j).get("createTime"));
-                                levelClock.get(i).put("afterTimeMsg","打卡成功");
-                                //更新打卡时间
-                                endClockStr = mapList.get(j).get("createTime").toString();
+                                levelClockList.get(i).put("afterTime",clockTime);
+                                levelClockList.get(i).put("afterTimeMsg","正常打卡");
+                                workClockTime = clockTime;
                             }
                         }else{
-                            levelClock.get(i).put("afterTime",mapList.get(j).get("createTime"));
-                            levelClock.get(i).put("afterTimeMsg","打卡成功");
-                            //更新打卡时间
-                            endClockStr = mapList.get(j).get("createTime").toString();
+                            //最后一个区间//取最后值
+                            levelClockList.get(i).put("afterTime",clockTime);
+                            levelClockList.get(i).put("afterTimeMsg","正常打卡");
+                            workClockTime = clockTime;
                         }
                     }
-                }/*else{
-                    if(DateUtils.compTime(createTime,endTime)){
-                        for(int l = levelClock.size()-1;l>=0;l--){
-                            if(DateUtils.compTime(createTime,levelClock.get(l).get("endTime").toString())){
-                                levelClock.get(l).put("afterTime",mapList.get(j).get("createTime").toString());
-                                levelClock.get(l).put("afterTimeMsg","打卡成功4");
-                                endClockStr = mapList.get(j).get("createTime").toString();
-                                break;
-                            }
+                }else{
+                    if(i==levelClockList.size()-1){
+                        if(DateUtils.compTime(createTime,endTime)){
+                            //判断是否有下次区间
+                            levelClockList.get(i).put("afterTime",clockTime);
+                            levelClockList.get(i).put("afterTimeMsg","正常打卡");
+                            workClockTime = clockTime;
                         }
+                    }else{
+                       if(DateUtils.compTime(createTime,startTime) && DateUtils.compTime(levelClockList.get(i+1).get("startTime").toString(),createTime)){
+                           levelClockList.get(i).put("afterTime",clockTime);
+                           levelClockList.get(i).put("afterTimeMsg","正常打卡");
+                           workClockTime = clockTime;
+                           break;
+                       }
                     }
-                }*/
+                }
             }
-            endStr = endTime;
+            levelTimeEndStr = endTime;
         }
-        return levelClock;
+        return levelClockList;
     }
 
     @Override
