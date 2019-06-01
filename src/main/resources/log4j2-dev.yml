@@ -9,7 +9,7 @@ Configuration:
     - name: log.level.console
       value: info
     - name: log.path
-      value: D://xiaowantong_logs
+      value: D://deyi_click_logs
     - name: project.name
       value: wantongbao
     - name: log.pattern
