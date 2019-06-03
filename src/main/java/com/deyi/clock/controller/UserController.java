@@ -56,9 +56,6 @@ public class UserController {
     @RequestMapping("login")
     @ResponseBody
     public Result login(HttpServletRequest request, LoginDTO loginDTO, HttpSession session){
-        System.out.println(loginDTO.getUserName());
-        System.out.println(loginDTO.getPassword());
-        System.out.println(loginDTO.getRememberMe());
         return ResultGenerator.genSuccessResult(loginDTO);
     }
     @RequestMapping("list")
