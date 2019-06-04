@@ -66,4 +66,8 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <!-- 查询用户信息 -->
+  <select id="findRolesByUserId" resultType="Role">
+        SELECT r.* from role r LEFT JOIN userRole ur on r.id = ur.roleId where ur.userId  = #{userId}
+    </select>
 </mapper>

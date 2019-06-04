@@ -38,6 +38,6 @@ pagehelper:
   #当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
   page-size-zero: true
 
-logging:
-  level:
-    com.deyi.clock.dao: DEBUG
+#logging:
+#  level:
+#    com.deyi.clock.dao: DEBUG

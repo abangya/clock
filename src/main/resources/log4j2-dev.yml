@@ -9,9 +9,9 @@ Configuration:
     - name: log.level.console
       value: info
     - name: log.path
-      value: D://deyi_click_logs
+      value: D://clock_logs
     - name: project.name
-      value: wantongbao
+      value: clock
     - name: log.pattern
       value: "%d{yyyy-MM-dd HH:mm:ss.SSS} -%5p ${PID:-} [%15.15t] %-30.30C{1.} : %m%n"
   Appenders:
@@ -131,7 +131,7 @@ Configuration:
       AppenderRef:
       - ref: DB_ROLLING_FILE
 #    监听具体包下面的日志
-    - name: com.xwt.xiaowantong.dao #复数加上-
+    - name: com.deyi.clock.dao #复数加上-
       additivity: false #去除重复的log
       level: trace
       AppenderRef:

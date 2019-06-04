@@ -5,7 +5,11 @@ import com.deyi.clock.config.core.ResultGenerator;
 import com.deyi.clock.domain.User;
 import com.deyi.clock.domain.dto.LoginDTO;
 import com.deyi.clock.service.UserService;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -53,13 +57,11 @@ public class UserController {
         return  userService.deleteUser(id);
     }
 
-    @RequestMapping("login")
+    @RequiresRoles(value = {"admin"},logical = Logical.OR)
+    @RequestMapping(value = "/del",method = RequestMethod.GET)
     @ResponseBody
-    public Result login(HttpServletRequest request, LoginDTO loginDTO, HttpSession session){
-        return ResultGenerator.genSuccessResult(loginDTO);
+    public String del(Model model) {
+        return "删除用户名为wangsaichao用户成功";
     }
-    @RequestMapping("list")
-    public String list(){
-        return "views/list";
-    }
+
 }

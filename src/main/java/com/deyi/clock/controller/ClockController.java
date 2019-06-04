@@ -35,7 +35,6 @@ public class ClockController {
         if(EmptyUtils.isNotEmpty(clockDto.getStartTime())){
             clockDto.setEndTime(clockDto.getStartTime());
         }
-
         List<ClockVo> mapList = clockService.clockAllUser(clockDto);
         map.put("pageNum",clockDto.getPageNum());
         map.put("pageSize",clockDto.getPageSize());

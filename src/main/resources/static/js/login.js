@@ -23,7 +23,7 @@ function login(){
     var username=$("#userName").val();
     var password=$("#password").val();
     var rememberMe = $("#rememberMe").val();
-    $.post("/user/login",$("#useLogin").serialize(),function(data){
+    $.post("/login",$("#useLogin").serialize(),function(data){
         if(data.code == 200){
             layer.msg('登录成功',{
                 time:1000

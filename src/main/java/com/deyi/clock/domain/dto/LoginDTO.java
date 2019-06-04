@@ -16,6 +16,6 @@ public class LoginDTO {
 
     private String password;
 
-    private String rememberMe;
+    private boolean rememberMe;
 
 }

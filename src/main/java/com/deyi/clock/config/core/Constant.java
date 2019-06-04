@@ -9,5 +9,14 @@ package com.deyi.clock.config.core;
  */
 public class Constant {
 
+    /**
+     * @title
+     * @description 状态正常
+     * @author lyz
+     * @updateTime 2019/6/3 0003 19:33
+     * @throws
+     */
+    public static final Integer STATUS_NORMAL = 1;
+
 
 }

@@ -3,7 +3,6 @@ package com.deyi.clock.controller;
 import com.deyi.clock.utils.log.LogUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Controller;
-
 import java.util.UUID;
 
 /**
@@ -13,7 +12,6 @@ import java.util.UUID;
  * @Description TODO
  * @createTime 2019年06月03日 09:17
  */
-@Controller
 public class BaseController {
     //获取业务日志logger
     protected final Logger bussinessLogger = LogUtils.getBussinessLogger();

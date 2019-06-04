@@ -86,5 +86,11 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-
+  <!-- 查询用户权限信息 -->
+  <select id="findPermissionsByRoleId" resultType="Permission">
+    SELECT p.* from permission p LEFT JOIN rolePermission rp on p.id = rp.permissionId WHERE rp.roleId IN
+    <foreach collection="roles" index="index" item="item" open="(" close=")" separator=",">
+      #{item.id}
+    </foreach>
+  </select>
 </mapper>
