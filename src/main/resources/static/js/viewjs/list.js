@@ -5,7 +5,7 @@ layui.use(['table','element'], function(){
         ,elem: '#test'
         ,url:'/clock/clockAllUser'
         ,method:"post"
-        ,height: 'full-44'
+        ,height: 'full-40'
         ,contentType: 'application/json'
         ,limit:20
         ,page:true

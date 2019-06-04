@@ -4,6 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpSession;
+
 /**
  * @author lyz
  * @version 1.0.0
@@ -24,5 +26,10 @@ public class ViewController extends BaseController{
     public String userList(){
         platformLogger.info("跳转用户管理页面");
         return "views/list";
+    }
+    @RequestMapping("/content")
+    public String content() {
+        platformLogger.info("跳转首页");
+        return "fragments/content";
     }
 }

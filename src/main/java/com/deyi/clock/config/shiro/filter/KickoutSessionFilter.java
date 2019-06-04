@@ -35,7 +35,6 @@ import java.util.Deque;
 public class KickoutSessionFilter extends AccessControlFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(KickoutSessionFilter.class);
-
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
     private String kickoutUrl; // 踢出后到的地址
@@ -82,8 +81,7 @@ public class KickoutSessionFilter extends AccessControlFilter {
         // 获得用户请求的URI
         HttpServletRequest req=(HttpServletRequest) request;
         String path = req.getRequestURI();
-        logger.info("===当前请求的uri:" + path);
-
+        logger.info("===当前请求的uri:{}",path);
         if(path.equals("/login")){
             return true;
         }

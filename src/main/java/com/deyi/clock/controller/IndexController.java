@@ -6,6 +6,9 @@ import com.deyi.clock.domain.User;
 import com.deyi.clock.domain.dto.LoginDTO;
 import com.deyi.clock.utils.EmptyUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -61,18 +64,25 @@ public class IndexController extends BaseController {
             return "redirect:home";
         }
     }
-
+    /**
+     * 转发login
+     * @return
+     */
     @GetMapping(value = "notLogin")
     public String notLogin(Model model) {
         platformLogger.info("退出转发到login");
         return "redirect:/login";
     }
 
+    /**
+     * 登录
+     * @return
+     */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
     public Result login(HttpServletRequest request, LoginDTO loginDTO, HttpSession session, Model model) {
 
-        platformLogger.info("登录操作"+loginDTO.toString());
+        platformLogger.info("登录操作{}",loginDTO.toString());
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(loginDTO.getUserName(), loginDTO.getPassword(),loginDTO.isRememberMe());
         Subject subject = SecurityUtils.getSubject();
         try {
@@ -83,12 +93,20 @@ public class IndexController extends BaseController {
             session.setAttribute("user", user);
             model.addAttribute("user", user);
             return ResultGenerator.genSuccessResult(user);
-        } catch (Exception e) {
+        } /*catch (Exception e) {
             //登录失败从request中获取shiro处理的异常信息 shiroLoginFailure:就是shiro异常类的全类名
             String exception = (String) request.getAttribute("shiroLoginFailure");
             model.addAttribute("msg", e.getMessage());
             //返回登录页面
             return ResultGenerator.genFailResult(e.getMessage());
+        }*/catch (IncorrectCredentialsException e) {
+            return ResultGenerator.genFailResult("密码错误，请重新输入！");
+        } catch (LockedAccountException e) {
+            return ResultGenerator.genFailResult("登录失败，该用户已被冻结！");
+        } catch (AuthenticationException e) {
+            return ResultGenerator.genFailResult("该用户不存在！");
+        } catch (Exception e) {
+            return ResultGenerator.genFailResult("未知信息！");
         }
     }
 
@@ -118,18 +136,6 @@ public class IndexController extends BaseController {
         model.addAttribute("msg", "安全退出！");
         platformLogger.info("退出"+subject.getPrincipal());
         return "login";
-    }
-
-    /**
-     * @title
-     * @description 首页
-     * @author lyz
-     * @updateTime 2019/6/3 0003 19:45
-     * @throws
-     */
-    @RequestMapping("/content")
-    public String content(HttpSession session) {
-        return "fragments/content";
     }
 
     /**

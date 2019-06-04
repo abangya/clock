@@ -40,8 +40,7 @@ public class ShiroRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken) authenticationToken;
         String username = usernamePasswordToken.getUsername();
-        String password = new String(usernamePasswordToken.getPassword());
-
+        //String password = new String(usernamePasswordToken.getPassword());
         //从数据库查询用户信息
         User user = this.userMapper.selectUserByName(username);
         //可以在这里直接对用户名校验,或者调用 CredentialsMatcher 校验
@@ -53,10 +52,6 @@ public class ShiroRealm extends AuthorizingRealm {
         }
         //调用 CredentialsMatcher 校验 还需要创建一个类 继承CredentialsMatcher  如果在上面校验了,这个就不需要了
         //配置自定义权限登录器 参考博客：
-        System.out.println("user"+user);
-        System.out.println("getPassword"+user.getPassword());
-        System.out.println("ByteSource"+new ByteSource(user.getUserName()));
-        System.out.println("user"+user);
         SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user,user.getPassword(),new ByteSource(user.getUserName()),getName());
         return info;
     }
@@ -131,9 +126,10 @@ public class ShiroRealm extends AuthorizingRealm {
         clearAllCachedAuthorizationInfo();
     }
 
-    public void removeUserAuthorizationInfoCache(String username) {
-        SimplePrincipalCollection pc = new SimplePrincipalCollection();
-        pc.add(username, super.getName());
-        super.clearCachedAuthorizationInfo(pc);
-    }
+    //    public void removeUserAuthorizationInfoCache(String username) {
+//        SimplePrincipalCollection pc = new SimplePrincipalCollection();
+//        pc.add(username, super.getName());
+//        super.clearCachedAuthorizationInfo(pc);
+//    }
+
 }
