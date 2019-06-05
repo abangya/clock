@@ -4,7 +4,10 @@ import com.deyi.clock.config.core.Result;
 import com.deyi.clock.config.core.ResultGenerator;
 import com.deyi.clock.domain.User;
 import com.deyi.clock.domain.dto.LoginDTO;
+import com.deyi.clock.domain.dto.UserListDto;
+import com.deyi.clock.domain.vo.UserVo;
 import com.deyi.clock.service.UserService;
+import com.deyi.clock.utils.EmptyUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
@@ -16,6 +19,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,6 +66,21 @@ public class UserController {
     @ResponseBody
     public String del(Model model) {
         return "删除用户名为wangsaichao用户成功";
+    }
+
+    @RequestMapping(value = "allUser",method = RequestMethod.POST)
+    @ResponseBody
+    public Result allUser(@RequestBody UserListDto userListDto){
+        Map<String,Object> map = new HashMap<>();
+        if(EmptyUtils.isNotEmpty(userListDto.getSearchTime())){
+            String[] searchTime = userListDto.getSearchTime().replace(" ","").split("~");
+            userListDto.setStartTime(searchTime[0]);
+            userListDto.setEndTime(searchTime[1]);
+        }
+        List<UserVo> userVoList =  userService.allUser(userListDto);
+        map.put("total",userService.allUserCount(userListDto));
+        map.put("list",userVoList);
+        return  ResultGenerator.genSuccessResult(map);
     }
 
 }

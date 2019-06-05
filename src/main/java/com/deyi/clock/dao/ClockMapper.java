@@ -26,7 +26,18 @@ public interface ClockMapper {
      * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
      * @throws
      */
-    List<ClockVo> clockAllUser(Map<String,Object> map);
+    List<ClockVo> clockAllUser(ClockDto clockDto);
+
+    /**
+     * @title clockAllUserCount
+     * @description 分页总数
+     * @author lyz
+     * @param: clockDto
+     * @updateTime 2019/6/5 0005 15:10
+     * @return: java.lang.Integer
+     * @throws
+     */
+    Integer clockAllUserCount(ClockDto clockDto);
     
     /**
      * @title userClock

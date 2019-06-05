@@ -2,6 +2,8 @@ package com.deyi.clock.service;
 
 import com.deyi.clock.domain.dto.ClockDto;
 import com.deyi.clock.domain.vo.ClockVo;
+import com.github.pagehelper.PageInfo;
+
 import java.util.List;
 import java.util.Map;
 
@@ -19,4 +21,6 @@ public interface ClockService {
     List<Map<String,Object>> userClock(ClockDto clockDto);
 
     List<Map<String,Object>> levelClock(Integer userId);
+
+    Integer clockAllUserCount(ClockDto clockDto);
 }

@@ -5,12 +5,32 @@
     .layui-table, .layui-table-view {
         margin: 0px;
     }
+    /* 防止下拉框下拉值被遮盖*/
+    /*.layui-table-cell {*/
+    /*    overflow: visible;*/
+    /*}*/
+
+    /*.layui-table-box {*/
+    /*    overflow: visible;*/
+    /*}*/
+
+    /*.layui-table-body {*/
+    /*    overflow: visible;*/
+    /*}*/
+    /* 调整高度 */
+    td .layui-form-select{
+        margin-top: -10px;
+        margin-left: -15px;
+        margin-right: -15px;
+        text-align: center;
+        text-align-last: center;
+    }
 </style>
 <body>
 <div class="demoTable">
     请输入姓名：
     <div class="layui-inline">
-        <input class="layui-input" name="userName" id="demoReload" autocomplete="off">
+        <input class="layui-input" name="searchName" id="userTableReload" autocomplete="off">
     </div>
     <div class="layui-inline">
         <label class="layui-form-label">请选择范围</label>
@@ -26,15 +46,21 @@
         <button class="layui-btn" data-type="open" id = "open">打卡设置</button>
     </div>
 </div>
-<table class="layui-hide" id="test" lay-filter="demo"></table>
-<script type="text/html" id="barDemo">
+<table class="layui-hide" id="userTable" lay-filter="userTableFilter"></table>
+<script type="text/html" id="userTableBar">
     <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
     <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
+<script type="text/html" id="genderSelect">
+    <select name="gender"  lay-filter="gender" data-value="{{d.gender}}">
+        <option value="1">男</option>
+        <option value="2">女</option>
+    </select>
+</script>
     <!-- 内容主体区域 -->
     <script type="text/javascript" th:src="@{/js/dateUtils.js}"></script>
-    <script type="text/javascript" th:src="@{/js/viewjs/list.js}"></script>
+    <script type="text/javascript" th:src="@{/js/viewjs/userList.js}"></script>
     <script type="text/javascript" th:src="@{/js/error.js}"></script>
 </body>
 </html>

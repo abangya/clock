@@ -7,14 +7,12 @@ import java.io.Serializable;
 /**
  * @author lyz
  * @version 1.0.0
- * @ClassName ClockDto
+ * @ClassName UserListDto
  * @Description TODO
- * @createTime 2019年05月29日 13:57
+ * @createTime 2019年06月05日 14:24
  */
 @Data
-public class ClockDto extends BaseDto implements Serializable{
+public class UserListDto extends BaseDto implements Serializable{
     private static final long serialVersionUID = 1L;
-    private int id;
-    private String userName;
-
+    private Integer id;
 }

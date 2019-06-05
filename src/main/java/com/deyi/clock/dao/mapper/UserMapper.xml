@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.deyi.clock.dao.UserMapper" >
+    <resultMap id="UserVoMap" type="UserVo">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="userName" jdbcType="VARCHAR" property="userName" />
+        <result column="age" jdbcType="INTEGER" property="age" />
+        <result column="photo" jdbcType="VARCHAR" property="photo" />
+        <result column="realName" jdbcType="VARCHAR" property="realName" />
+        <result column="headImg" jdbcType="VARCHAR" property="headImg" />
+        <result column="phone" jdbcType="VARCHAR" property="phone" />
+        <result column="gender" jdbcType="INTEGER" property="gender" />
+        <result column="createTime" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="registerIp" jdbcType="VARCHAR" property="registerIp" />
+        <result column="lastLoginTime" jdbcType="TIMESTAMP" property="lastLoginTime" />
+        <result column="tel" jdbcType="VARCHAR" property="tel" />
+        <result column="nickName" jdbcType="VARCHAR" property="nickName" />
+        <collection property="userRoleVoList" ofType="UserRoleVo">
+            <id column="roleId" jdbcType="INTEGER" property="roleId" />
+            <result column="description" jdbcType="VARCHAR" property="description" />
+            <collection property="rolePermissionVoList" ofType="RolePermissionVo">
+                <id column="permissionId" jdbcType="INTEGER" property="permissionId" />
+                <result column="permissionName" jdbcType="VARCHAR" property="permissionName" />
+            </collection>
+        </collection>
+    </resultMap>
    <!--查询-->
     <select id="selectUserByName"  resultType="User">
         SELECT * FROM user WHERE userName = #{userName}
@@ -48,5 +72,38 @@
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
+    <!--分页查询-->
+    <select id = "allUser" parameterType="UserListDto" resultMap="UserVoMap">
+        select u.id,u.userName,u.age,u.photo,u.realName,u.headImg,u.phone,u.gender,u.createTime,u.`status`,u.registerIp,
+        u.lastLoginTime,u.tel,u.nickName,r.id roleId,r.description,p.id permissionId,p.name permissionName
+        from (
+        select * from user
+        <where>
+            <if test="startTime != null &amp;&amp; startTime!='' ">
+                and DATE_FORMAT(createTime,'%Y-%m-%d') >= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null &amp;&amp; endTime!='' ">
+                and DATE_FORMAT(createTime,'%Y-%m-%d') &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        limit #{startNum},#{size}
+        ) u
+        LEFT JOIN userRole ur on u.id = ur.userId
+        LEFT JOIN role r on r.id = ur.roleId and r.state = 1
+        LEFT JOIN rolepermission rp on r.id = rp.roleId
+        LEFT JOIN permission p on rp.permissionId = p.id and p.state = 1
+    </select>
 
+    <!--分页查询数量-->
+    <select id = "allUserCount" parameterType="UserListDto" resultType="Integer">
+        select count(1) from user
+        <where>
+            <if test="startTime != null &amp;&amp; startTime!='' ">
+                and DATE_FORMAT(createTime,'%Y-%m-%d') >= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null &amp;&amp; endTime!='' ">
+                and DATE_FORMAT(createTime,'%Y-%m-%d') &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </select>
 </mapper>

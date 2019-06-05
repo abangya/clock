@@ -7,6 +7,8 @@ import com.deyi.clock.service.ClockService;
 import com.deyi.clock.utils.DateUtils;
 import com.deyi.clock.utils.EmptyUtils;
 import com.deyi.clock.utils.MathUtils;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
@@ -26,19 +28,19 @@ public class ClockServiceImpl implements ClockService {
 
     @Override
     public List<ClockVo> clockAllUser(ClockDto clockDto) {
-        Map<String,Object> mapTemp = new HashMap<>();
-        mapTemp.put("startNum",(clockDto.getPageNum()-1)*clockDto.getPageSize());
-        mapTemp.put("endNum",clockDto.getPageSize());
-        mapTemp.put("userName",clockDto.getUserName());
-        mapTemp.put("startTime",clockDto.getStartTime());
-        mapTemp.put("endTime",clockDto.getEndTime());
-        List<ClockVo> mapList = clockMapper.clockAllUser(mapTemp);
-        for (ClockVo map:mapList) {
+       /* PageHelper.startPage((Integer) map.get("pageNum"), (Integer) map.get("pageSize"));
+        PageHelper.orderBy((String)map.get("sort"));
+        PageInfo<Map<String, Object>> page = new PageInfo<>(babyInfoMapper.selectBySelective(map));*/
+       if(EmptyUtils.isNotEmpty(clockDto.getStartNum())){
+           clockDto.setStartNum((clockDto.getStartNum()-1)*clockDto.getSize());
+       }
+        List<ClockVo> page =clockMapper.clockAllUser(clockDto);
+        for (ClockVo map:page) {
             if(EmptyUtils.isEmpty(map.getUserName())){
                 map.setUserName(map.getClockName());
             }
         }
-        return mapList;
+        return page;
     }
 
     @Override
@@ -175,6 +177,11 @@ public class ClockServiceImpl implements ClockService {
     @Override
     public List<Map<String, Object>> levelClock(Integer userId) {
         return clockMapper.levelClock(userId);
+    }
+
+    @Override
+    public Integer clockAllUserCount(ClockDto clockDto) {
+        return clockMapper.clockAllUserCount(clockDto);
     }
 
 }

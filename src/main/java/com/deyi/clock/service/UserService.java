@@ -1,6 +1,11 @@
 package com.deyi.clock.service;
 
 import com.deyi.clock.domain.User;
+import com.deyi.clock.domain.dto.UserListDto;
+import com.deyi.clock.domain.vo.UserVo;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lyz
@@ -18,5 +23,9 @@ public interface UserService {
     Integer deleteUser(Integer id);
 
     Integer updateUser(User user);
+
+    List<UserVo> allUser(UserListDto userListDto);
+
+    Integer allUserCount(UserListDto userListDto);
 
 }

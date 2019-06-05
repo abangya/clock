@@ -1,7 +1,12 @@
 package com.deyi.clock.dao;
 
 import com.deyi.clock.domain.User;
+import com.deyi.clock.domain.dto.UserListDto;
+import com.deyi.clock.domain.vo.UserVo;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lyz
@@ -20,4 +25,7 @@ public interface UserMapper {
 
     Integer updateUser(User user);
 
+    List<UserVo> allUser(UserListDto userListDto);
+
+    Integer allUserCount(UserListDto userListDto);
 }

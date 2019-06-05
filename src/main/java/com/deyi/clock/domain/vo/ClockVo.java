@@ -1,7 +1,10 @@
 package com.deyi.clock.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -12,8 +15,9 @@ import java.util.List;
  * @createTime 2019年05月30日 15:16
  */
 @Data
-public class ClockVo {
+public class ClockVo implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private Integer clockId;
     private String clockPhoto;
     private String clockCreateTime;
@@ -26,4 +30,5 @@ public class ClockVo {
     private Integer clId;
     private Integer level;
     private List<DimensionVo> dimensionVoList;
+
 }

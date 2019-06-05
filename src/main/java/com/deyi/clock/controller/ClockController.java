@@ -28,17 +28,12 @@ public class ClockController {
     public Result clockAllUser(@RequestBody ClockDto clockDto){
         Map<String,Object> map = new HashMap<>();
         if(EmptyUtils.isNotEmpty(clockDto.getSearchTime())){
-            String[] searchTime = clockDto.getSearchTime().split("~");
+            String[] searchTime = clockDto.getSearchTime().replace(" ","").split("~");
             clockDto.setStartTime(searchTime[0]);
             clockDto.setEndTime(searchTime[1]);
         }
-        if(EmptyUtils.isNotEmpty(clockDto.getStartTime())){
-            clockDto.setEndTime(clockDto.getStartTime());
-        }
         List<ClockVo> mapList = clockService.clockAllUser(clockDto);
-        map.put("pageNum",clockDto.getPageNum());
-        map.put("pageSize",clockDto.getPageSize());
-        map.put("total",clockDto.getPageSize());
+        map.put("total",clockService.clockAllUserCount(clockDto));
         map.put("list",mapList);
         return ResultGenerator.genSuccessResult(map);
     }

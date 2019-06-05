@@ -22,36 +22,37 @@
         </collection>
     </resultMap>
     <!--人员列表-->
-    <select id="clockAllUser" parameterType="java.util.Map" resultMap="BaseResultMap">
+    <select id="clockAllUser" parameterType="ClockDto" resultMap="BaseResultMap">
         select temp.*,d.id dId,d.startTime,d.endTime,d.parentId,d.sort from (
-        select c.id clockId,c.photo clockPhoto,DATE_FORMAT(c.createTime,'%Y-%m-%d %H:%i:%S') clockCreateTime,
-        c.ipAddress clockIpAddress,c.name clockName,u.id,u.userName,u.age,u.photo,cl.id clId,cl.level
-        from clock c
-        LEFT JOIN user u on c.photo = u.photo
-        LEFT JOIN userlevel ul on ul.userId = u.id
-        LEFT JOIN clocklevel cl on cl.id = ul.levelId
-        <where>
-            <if test="userName != null &amp;&amp; userName != ''">
-                and u.userName = #{userName,jdbcType=VARCHAR}
-            </if>
-            <if test="startTime != null &amp;&amp; startTime!='' ">
-                and DATE_FORMAT(c.createTime,'%Y-%m-%d') >= #{startTime,jdbcType=TIMESTAMP}
-            </if>
-            <if test="endTime != null &amp;&amp; endTime!='' ">
-                and DATE_FORMAT(c.createTime,'%Y-%m-%d') &lt;= #{endTime,jdbcType=TIMESTAMP}
-            </if>
-        </where>
-        GROUP BY c.photo,DATE_FORMAT(c.createTime,'%Y-%m-%d')
-        limit #{startNum},#{endNum}
-        )temp
-        LEFT JOIN dimension d on d.parentId = temp.clId
+            select c.id clockId,c.photo clockPhoto,DATE_FORMAT(c.createTime,'%Y-%m-%d %H:%i:%S') clockCreateTime,
+            c.ipAddress clockIpAddress,c.name clockName,u.id,u.userName,u.age,u.photo,cl.id clId,cl.level
+             from clock c
+            LEFT JOIN user u on c.photo = u.photo
+            LEFT JOIN userlevel ul on ul.userId = u.id
+            LEFT JOIN clocklevel cl on ul.levelId = cl.id
+            <where>
+                <if test="userName != null &amp;&amp; userName != ''">
+                    and u.userName = #{userName,jdbcType=VARCHAR}
+                </if>
+                <if test="startTime != null &amp;&amp; startTime!='' ">
+                    and DATE_FORMAT(c.createTime,'%Y-%m-%d') >= #{startTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="endTime != null &amp;&amp; endTime!='' ">
+                    and DATE_FORMAT(c.createTime,'%Y-%m-%d') &lt;= #{endTime,jdbcType=TIMESTAMP}
+                </if>
+            </where>
+            GROUP BY c.photo,DATE_FORMAT(c.createTime,'%Y-%m-%d')
+            limit #{startNum},#{size}
+            ) temp
+        LEFT JOIN dimension d on temp.clId = d.parentId
         ORDER BY temp.clockCreateTime desc,temp.userName,d.startTime
     </select>
     <!--人员列表-->
     <select id="clockAllUserCount" parameterType="ClockDto" resultType="Integer">
+        SELECT count(1) from (
         select count(1)
         from clock c
-        left join user u on c.photo = u.photo
+        LEFT JOIN user u on c.photo = u.photo
         LEFT JOIN userlevel ul on ul.userId = u.id
         LEFT JOIN clocklevel cl on cl.id = ul.levelId
         <where>
@@ -66,7 +67,7 @@
             </if>
         </where>
         GROUP BY c.photo,DATE_FORMAT(c.createTime,'%Y-%m-%d')
-
+        ) count
     </select>
     <!--个人打卡记录-->
     <select id="userClock" parameterType="ClockDto" resultType="java.util.Map">

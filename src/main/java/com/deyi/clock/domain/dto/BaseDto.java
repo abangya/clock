@@ -2,6 +2,8 @@ package com.deyi.clock.domain.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author lyz
  * @version 1.0.0
@@ -10,10 +12,13 @@ import lombok.Data;
  * @createTime 2019年05月29日 14:05
  */
 @Data
-public class BaseDto{
-    private Integer pageNum;
-    private Integer pageSize;
+public class BaseDto implements Serializable{
+    private static final long serialVersionUID = 1L;
+    private Integer startNum;
+    private Integer size;
     private String startTime;
     private String endTime;
     private String searchTime;
+    private String searchName;
+
 }

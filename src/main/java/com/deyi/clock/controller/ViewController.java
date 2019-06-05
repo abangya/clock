@@ -25,7 +25,7 @@ public class ViewController extends BaseController{
     @GetMapping("userList")
     public String userList(){
         platformLogger.info("跳转用户管理页面");
-        return "views/list";
+        return "views/userList";
     }
     @RequestMapping("/content")
     public String content() {

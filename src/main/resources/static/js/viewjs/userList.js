@@ -1,9 +1,10 @@
 layui.use(['table','element'], function(){
-    var table = layui.table;
+    var table = layui.table,
+        form = layui.form;
     table.render({
-        id:'contenttable'
-        ,elem: '#test'
-        ,url:'/clock/clockAllUser'
+        id:'userListTable'
+        ,elem: '#userTable'
+        ,url:'/user/allUser'
         ,method:"post"
         ,height: 'full-40'
         ,contentType: 'application/json'
@@ -31,34 +32,53 @@ layui.use(['table','element'], function(){
         ,cols: [[
             {type:'checkbox',width:'5%'},
             {type:'numbers',title:'序号',width:'5%'},
-            {field:'clockCreateTime', width:"12%", title: '日期时间',align:'center',
+            {field:'realName', width:"8%", title: '真实姓名',align:'center',edit: 'text'},
+            {field: 'gender', title: '性别', width: '6%',align: 'center', templet:'#genderSelect'},
+            {field:'tel', width:"8%", title: '手机号码',align:'center'},
+            {field:'userName', width:"8%", title: '用户名',align:'center'},
+            {field:'nickName', width:"8%", title: '昵称',align:'center'},
+            {field:'status', width:"8%", title: '状态',align:'center',
                 templet:function (row) {
-                    if(!row.clockCreateTime){
-                        return "<span style='color:red'>暂无打卡记录</span>";
+                    if(row.status == 1){
+                        return "<span style='color:green'>正常</span>";
+                    }else{
+                        return "<span style='color:red'>异常</span>";
                     }
-                    return DateUtils.dateFormat("yyyy-MM-dd",new Date(row.clockCreateTime));
                 }
             },
-            {field:'userName', width:"8%", title: '用户名',align:'center'},
-            {field:'level', width:"8%", title: '打卡次数',align:'center'},
-            {field:'time', width:"45%", title: '考核区间',
-                templet:function (row) {
-                    var str = '';
-                for(var i = 0 ;i<row.dimensionVoList.length;i++){
-                    str+= row.dimensionVoList[i].startTime+"-"+row.dimensionVoList[i].endTime+"  ";
-                }
-                    return str;
-                }},
-
-            {fixed: 'right', width:"17%", align:'center', toolbar: '#barDemo'}
-        ]]
+            {field:'headImg', width:"8%", title: '头像',align:'center'},
+            {field:'photo', width:"8%", title: '绑定照片',align:'center'},
+            {field:'lastLoginTime', width:"8%", title: '上次登录时间',align:'center'},
+            {fixed: 'right', width:"17%", align:'center', toolbar: '#userTableBar'}
+        ]],
+        done:function (res, curr, count) {
+            layui.each($('select'),function (index,item) {
+                var elem = $(item);
+                elem.val(elem.data('value')).parents('div.layui-table-cell').css('overflow', 'visible');
+            })
+            form.render();
+        }
+    });
+    form.on('select(gender)', function(obj){
+        var elem = $(obj.elem);
+        var trElem = elem.parents('tr');
+        var tableData = table.cache['userListTable'];
+        // 更新到表格的缓存数据中，才能在获得选中行等等其他的方法中得到更新之后的值
+        tableData[trElem.data('index')][elem.attr('name')] = obj.value;
+    });
+    //监听单元格编辑
+    table.on('edit(userTableFilter)', function(obj){
+        var value = obj.value //得到修改后的值
+            ,data = obj.data //得到所在行所有键值
+            ,field = obj.field; //得到字段
+        layer.msg('[ID: '+ data.id +'] ' + field + ' 字段更改为：'+ value);
     });
     //监听表格复选框选择
-    table.on('checkbox(demo)', function(obj){
+    table.on('checkbox(userTableFilter)', function(obj){
         console.log(obj)
     });
     //监听工具条
-    table.on('tool(demo)', function(obj){
+    table.on('tool(userTableFilter)', function(obj){
         var data = obj.data;
         if(obj.event === 'detail'){
             $.ajax({
@@ -149,16 +169,16 @@ layui.use(['table','element'], function(){
             var checkStatus = table.checkStatus('contenttable');
             layer.msg(checkStatus.isAll ? '全选': '未全选')
         },reload: function(){
-            var demoReload = $('#demoReload');
+            var userTableReload = $('#userTableReload');
             var searchTime = $('#searchTime');
             console.log(searchTime.val())
             //执行重载
-            table.reload('contenttable', {
+            table.reload('userListTable', {
                 page: {
                     curr: 1 //重新从第 1 页开始
                 }
                 ,where: {
-                    userName: demoReload.val(),
+                    searchName: userTableReload.val(),
                     searchTime:searchTime.val()
                 }
             });
@@ -177,6 +197,10 @@ layui.use(['table','element'], function(){
             });
         }
     };
+//监听性别操作
+    form.on('switch(sexDemo)', function(obj){
+        layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+    });
 
     $('.demoTable .layui-btn').on('click', function(){
         var type = $(this).data('type');
