@@ -3,6 +3,7 @@ package com.deyi.clock.domain.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * @author lyz
@@ -20,5 +21,5 @@ public class BaseDto implements Serializable{
     private String endTime;
     private String searchTime;
     private String searchName;
-
+    private Set searchRole;
 }

@@ -80,14 +80,19 @@ public class IndexController extends BaseController {
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
-    public Result login(HttpServletRequest request, LoginDTO loginDTO, HttpSession session, Model model) {
-
+    public Result login(HttpServletRequest request, @RequestBody LoginDTO loginDTO, HttpSession session, Model model) {
         platformLogger.info("登录操作{}",loginDTO.toString());
-        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(loginDTO.getUserName(), loginDTO.getPassword(),loginDTO.isRememberMe());
+        boolean flag = false;
+        if (null != loginDTO.getRememberMe() && loginDTO.getRememberMe().equals("on")) {
+            flag = true;
+        }
+        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(loginDTO.getUserName(), loginDTO.getPassword(),flag);
         Subject subject = SecurityUtils.getSubject();
         try {
             //登录操作
             subject.login(usernamePasswordToken);
+            // 设置 remenmberMe 的功能
+
             User user = (User) subject.getPrincipal();
             //更新用户登录时间，也可以在ShiroRealm里面做
             session.setAttribute("user", user);

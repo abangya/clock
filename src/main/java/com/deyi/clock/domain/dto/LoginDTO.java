@@ -3,6 +3,8 @@ package com.deyi.clock.domain.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @title 登录dto
  * @description 
@@ -11,7 +13,7 @@ import lombok.Data;
  * @throws 
  */
 @Data
-public class LoginDTO {
+public class LoginDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -19,6 +21,6 @@ public class LoginDTO {
 
     private String password;
 
-    private boolean rememberMe;
+    private String rememberMe;
 
 }

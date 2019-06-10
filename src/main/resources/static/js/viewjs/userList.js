@@ -1,14 +1,15 @@
 layui.use(['table','element'], function(){
     var table = layui.table,
-        form = layui.form;
-    table.render({
+        form = layui.form,
+        element = layui.element;
+        table.render({
         id:'userListTable'
         ,elem: '#userTable'
         ,url:'/user/allUser'
         ,method:"post"
         ,height: 'full-40'
         ,contentType: 'application/json'
-        ,limit:20
+        ,limit:10
         ,page:true
         ,request: {
             pageName: 'startNum' //页码的参数名称，默认：page
@@ -33,28 +34,43 @@ layui.use(['table','element'], function(){
             {type:'checkbox',width:'5%'},
             {type:'numbers',title:'序号',width:'5%'},
             {field:'realName', width:"8%", title: '真实姓名',align:'center',edit: 'text'},
-            {field: 'gender', title: '性别', width: '6%',align: 'center', templet:'#genderSelect'},
-            {field:'tel', width:"8%", title: '手机号码',align:'center'},
-            {field:'userName', width:"8%", title: '用户名',align:'center'},
-            {field:'nickName', width:"8%", title: '昵称',align:'center'},
-            {field:'status', width:"8%", title: '状态',align:'center',
-                templet:function (row) {
-                    if(row.status == 1){
-                        return "<span style='color:green'>正常</span>";
-                    }else{
-                        return "<span style='color:red'>异常</span>";
+            {field:'userRole', width:"8%", title: '角色',align:'center',
+                templet: function (row) {
+                    var str = '';
+                    for(let  i of row.userRoleVoList){
+                        str += i.description+',';
                     }
+                    if(str.endsWith(",")){
+                        str = str.substring(0,str.length-1)
+                    }
+                    return str;
                 }
             },
-            {field:'headImg', width:"8%", title: '头像',align:'center'},
-            {field:'photo', width:"8%", title: '绑定照片',align:'center'},
+            {field: 'gender', title: '性别', width: '6%',align: 'center', templet:'#genderSelect'},
+            {field:'tel', width:"8%", title: '手机号码',align:'center',edit: 'text'},
+            {field:'userName', width:"8%", title: '用户名',align:'center'},
+            {field:'nickName', width:"8%", title: '昵称',align:'center',edit: 'text'},
+            {field:'status', title:'状态', width:"6%", align:'center',templet: '#status'},
+            {field:'headImg', width:"8%", title: '头像',align:'center',
+                templet:function (row) {
+                    return '<div onclick="show_img(this)" ><img src="'+row.headImg+'" alt="" onerror="this.style.display=\'none\'" width="50px" height="50px"></a></div>';
+                }
+            },
+            {field:'photo', width:"8%", title: '绑定照片',align:'center',
+                templet:function (row) {
+                    return '<div onclick="show_img(this)" ><img src="'+row.photo+'" alt="" onerror="this.style.display=\'none\'" width="50px" height="50px"></a></div>';
+                }
+            },
             {field:'lastLoginTime', width:"8%", title: '上次登录时间',align:'center'},
-            {fixed: 'right', width:"17%", align:'center', toolbar: '#userTableBar'}
+            {fixed: 'right', width:"12%", align:'center', toolbar: '#userTableBar'}
         ]],
         done:function (res, curr, count) {
             layui.each($('select'),function (index,item) {
                 var elem = $(item);
-                elem.val(elem.data('value')).parents('div.layui-table-cell').css('overflow', 'visible');
+                if(elem.attr("name") == 'gender' || elem.attr("name") == 'role'){
+                    elem.val(elem.data('value')).parents('div.layui-table-cell').css('overflow', 'visible');
+                }
+
             })
             form.render();
         }
@@ -65,6 +81,18 @@ layui.use(['table','element'], function(){
         var tableData = table.cache['userListTable'];
         // 更新到表格的缓存数据中，才能在获得选中行等等其他的方法中得到更新之后的值
         tableData[trElem.data('index')][elem.attr('name')] = obj.value;
+    });
+    //监听账号状态操作
+    form.on('switch(statusFilter)', function(obj){
+        var elem = $(obj.elem);
+        var trElem = elem.parents('tr');
+        var tableData = table.cache['userListTable'];
+        var str = 2;
+        if(obj.elem.checked){
+            str = 1;
+        }
+        layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+        tableData[trElem.data('index')][elem.attr('name')] = str;
     });
     //监听单元格编辑
     table.on('edit(userTableFilter)', function(obj){
@@ -77,74 +105,12 @@ layui.use(['table','element'], function(){
     table.on('checkbox(userTableFilter)', function(obj){
         console.log(obj)
     });
+
     //监听工具条
     table.on('tool(userTableFilter)', function(obj){
         var data = obj.data;
         if(obj.event === 'detail'){
-            $.ajax({
-                url: '/clock/userClock',
-                type: 'POST',
-                data: JSON.stringify({id:data.id,searchTime:data.clockCreateTime}),
-                contentType:'application/json; charset=utf-8',
-                dataType : "json",
-                success: function (result) {
-                    layer.open({
-                        type: 1,
-                        anim: 0,
-                        title: data.userName+"打卡记录",
-                        area: ['60%', '60%'],
-                        btn: ['关闭'],
-                        content: "<div style='height: 100%;'><table id=\"templateTable\"></table></div>",
-                        success : function(index, layero) {
-                            table.render({
-                                elem: '#templateTable'
-                                ,data:result.data
-                                ,height: 'full-450'
-                                ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-                                ,cols: [[
-                                    {type:'numbers',title:'序号'},
-                                    {field:'clockTime',title:'正常上班区间',
-                                        templet:function (row) {
-                                            return row.startTime +" - "+ row.endTime;
-                                        }
-                                    },
-                                    {field:'workTime', title: '上班打卡时间',
-                                        templet:function (row) {
-                                            if(!row.workTime){
-                                                return "<span style='color:red'>"+row.workTimeMsg+"</span>";
-                                            }
-                                            var str = '';
-                                            if("正常打卡"==row.workTimeMsg){
-                                                str = "(<span style='color:green'>"+row.workTimeMsg+"</span>)";
-                                            }else{
-                                                str = "(<span style='color:red'>"+row.workTimeMsg+"</span>)";
-                                            }
-                                            return DateUtils.dateFormat("yyyy-MM-dd hh:mm:ss",new Date(row.workTime))+str;
-
-
-                                        }
-                                    },
-                                    {field:'afterTime', title: '下班打卡时间',
-                                        templet:function (row) {
-                                            if(!row.afterTime){
-                                                return "<span style='color:red'>"+row.afterTimeMsg+"</span>";
-                                            }
-                                            var str = '';
-                                            if("正常打卡"==row.afterTimeMsg){
-                                                str = "(<span style='color:green'>"+row.afterTimeMsg+"</span>)";
-                                            }else{
-                                                str = "(<span style='color:red'>"+row.afterTimeMsg+"</span>)";
-                                            }
-                                            return DateUtils.dateFormat("yyyy-MM-dd hh:mm:ss",new Date(row.afterTime))+str;
-
-                                        }
-                                    }
-                                ]]
-                            });
-                        },
-                    });
-                }
-            });
+            layer.msg(JSON.stringify(data))
         } else if(obj.event === 'del'){
             layer.confirm('真的删除行么', function(index){
                 obj.del();
@@ -171,7 +137,8 @@ layui.use(['table','element'], function(){
         },reload: function(){
             var userTableReload = $('#userTableReload');
             var searchTime = $('#searchTime');
-            console.log(searchTime.val())
+            var searchRole = formSelects.value('roleSelect', 'val');
+            console.log(searchRole)
             //执行重载
             table.reload('userListTable', {
                 page: {
@@ -179,35 +146,37 @@ layui.use(['table','element'], function(){
                 }
                 ,where: {
                     searchName: userTableReload.val(),
-                    searchTime:searchTime.val()
+                    searchTime:searchTime.val(),
+                    searchRole:searchRole
                 }
-            });
-        },open:function () {
-            layui.use('layer', function(){
-                var layer = layui.layer;
-                /*$(document).on('click','#open',function(){
-                    layer.msg('hello');
-                });*/
-                layer.open({
-                    title: '设置页面',
-                    type: 2,
-                    area: ["1000px","500px"],
-                    content: '/'
-                });
             });
         }
     };
-//监听性别操作
-    form.on('switch(sexDemo)', function(obj){
-        layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
-    });
-
     $('.demoTable .layui-btn').on('click', function(){
         var type = $(this).data('type');
+        console.log("type"+type)
         active[type] ? active[type].call(this) : '';
     });
+    formSelects.data('roleSelect', 'server', {
+        url: '/role/roles',
+        type:'get',
+        response: {
+            statusCode: 200,          //成功状态码
+            statusName: 'code',     //code key
+            msgName: 'message',         //msg key
+            dataName: 'data'        //data key
+        },
+        keyName: 'name',            //自定义返回数据中name的key, 默认 name
+        keyVal: 'value',
+        success: function(id, url, searchVal, result){      //使用远程方式的success回调
+            console.log(result);    //返回的结果
+        },
+        error: function(id, url, searchVal, err){           //使用远程方式的error回调
+            //同上
+            console.log(err);   //err对象
+        }
+    });
 
-    var element = layui.element;
 });
 layui.use('laydate', function(){
     var laydate = layui.laydate;
@@ -218,3 +187,21 @@ layui.use('laydate', function(){
         range: '~'
     });
 });
+
+//显示大图片
+function show_img(t) {
+    var t = $(t).find("img");
+    //页面层
+    layer.open({
+        title:'图片详情',
+        type: 1,
+        skin: 'layui-layer-rim', //加上边框
+        area: ['40%', '50%'], //宽高
+        shadeClose: true, //开启遮罩关闭
+        end: function (index, layero) {
+            return false;
+        },
+        content: '<div style="text-align:center"><img src="' + $(t).attr('src') + '" /></div>'
+    });
+}
+

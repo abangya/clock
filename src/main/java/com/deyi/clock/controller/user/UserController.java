@@ -1,4 +1,4 @@
-package com.deyi.clock.controller;
+package com.deyi.clock.controller.user;
 
 import com.deyi.clock.config.core.Result;
 import com.deyi.clock.config.core.ResultGenerator;

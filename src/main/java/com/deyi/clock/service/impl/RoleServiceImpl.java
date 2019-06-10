@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -37,5 +38,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public int updateByPrimaryKeySelective(Role record) {
         return roleMapper.updateByPrimaryKeySelective(record);
+    }
+
+    @Override
+    public List<Role> roles() {
+        return roleMapper.roles();
     }
 }

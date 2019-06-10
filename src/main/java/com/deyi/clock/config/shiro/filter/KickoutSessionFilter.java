@@ -81,12 +81,12 @@ public class KickoutSessionFilter extends AccessControlFilter {
         // 获得用户请求的URI
         HttpServletRequest req=(HttpServletRequest) request;
         String path = req.getRequestURI();
-        logger.info("===当前请求的uri:{}",path);
+        //logger.info("===当前请求的uri:{}",path);
         if(path.equals("/login")){
             return true;
         }
         Session session = subject.getSession();
-        logger.info("session时间设置：" + String.valueOf(session.getTimeout()));
+       // logger.info("session时间设置：" + String.valueOf(session.getTimeout()));
 
         try{
             // 当前用户
@@ -97,7 +97,7 @@ public class KickoutSessionFilter extends AccessControlFilter {
             logger.info("===当前用户sessionId:" + sessionId);
             // 读取缓存用户 没有就存入
             Deque<Serializable> deque = cache.get(username);
-            logger.debug("===当前deque:" + deque);
+            //logger.debug("===当前deque:" + deque);
             if (deque == null) {
                 // 初始化队列
                 deque = new ArrayDeque<Serializable>();
@@ -111,7 +111,7 @@ public class KickoutSessionFilter extends AccessControlFilter {
             }
             // 如果队列里的sessionId数超出最大会话数，开始踢人
             while (deque.size() > maxSession) {
-                logger.debug("===deque队列长度:" + deque.size());
+                //logger.debug("===deque队列长度:" + deque.size());
                 Serializable kickoutSessionId = null;
                 // 是否踢出后来登录的，默认是false；即后者登录的用户踢出前者登录的用户；
                 if (kickoutAfter) { // 如果踢出后者

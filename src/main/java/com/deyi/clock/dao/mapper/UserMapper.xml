@@ -85,6 +85,9 @@
             <if test="endTime != null &amp;&amp; endTime!='' ">
                 and DATE_FORMAT(createTime,'%Y-%m-%d') &lt;= #{endTime,jdbcType=TIMESTAMP}
             </if>
+            <if test="searchName != null &amp;&amp; searchName!='' ">
+                and realName like CONCAT('%',#{searchName,jdbcType=VARCHAR},'%')
+            </if>
         </where>
         limit #{startNum},#{size}
         ) u
@@ -92,18 +95,42 @@
         LEFT JOIN role r on r.id = ur.roleId and r.state = 1
         LEFT JOIN rolepermission rp on r.id = rp.roleId
         LEFT JOIN permission p on rp.permissionId = p.id and p.state = 1
+        <where>
+            <if test="null != searchRole &amp;&amp; searchRole.size > 0">
+                r.id in
+                <foreach item="item" collection="searchRole" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
     </select>
 
     <!--分页查询数量-->
     <select id = "allUserCount" parameterType="UserListDto" resultType="Integer">
-        select count(1) from user
+        select count(1) from (
+        select count(1) from user u
+        LEFT JOIN userrole ur on ur.userId = u.id
+        LEFT JOIN role r on r.id = ur.roleId and r.state = 1
         <where>
             <if test="startTime != null &amp;&amp; startTime!='' ">
-                and DATE_FORMAT(createTime,'%Y-%m-%d') >= #{startTime,jdbcType=TIMESTAMP}
+                and DATE_FORMAT(u.createTime,'%Y-%m-%d') >= #{startTime,jdbcType=TIMESTAMP}
             </if>
             <if test="endTime != null &amp;&amp; endTime!='' ">
-                and DATE_FORMAT(createTime,'%Y-%m-%d') &lt;= #{endTime,jdbcType=TIMESTAMP}
+                and DATE_FORMAT(u.createTime,'%Y-%m-%d') &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="searchName != null &amp;&amp; searchName!='' ">
+                and u.realName like CONCAT('%',#{searchName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="null != searchRole &amp;&amp; searchRole.size > 0">
+                and r.id in
+                <foreach item="item" collection="searchRole" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
             </if>
         </where>
+        GROUP BY u.id
+        ) temp
+
     </select>
+
 </mapper>

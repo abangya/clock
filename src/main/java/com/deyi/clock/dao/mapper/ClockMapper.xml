@@ -32,7 +32,7 @@
             LEFT JOIN clocklevel cl on ul.levelId = cl.id
             <where>
                 <if test="userName != null &amp;&amp; userName != ''">
-                    and u.userName = #{userName,jdbcType=VARCHAR}
+                    and u.userName like CONCAT('%',#{userName,jdbcType=VARCHAR},'%')
                 </if>
                 <if test="startTime != null &amp;&amp; startTime!='' ">
                     and DATE_FORMAT(c.createTime,'%Y-%m-%d') >= #{startTime,jdbcType=TIMESTAMP}
