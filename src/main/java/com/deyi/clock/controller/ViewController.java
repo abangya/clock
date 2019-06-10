@@ -27,6 +27,12 @@ public class ViewController extends BaseController{
         platformLogger.info("跳转用户管理页面");
         return "views/userList";
     }
+
+    @GetMapping("checkInStatistics")
+    public String checkInStatistics(){
+        platformLogger.info("跳转签到统计页面");
+        return "views/checkInStatistics";
+    }
     @RequestMapping("/content")
     public String content() {
         platformLogger.info("跳转首页");
