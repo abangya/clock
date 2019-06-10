@@ -21,5 +21,6 @@ public class BaseDto implements Serializable{
     private String endTime;
     private String searchTime;
     private String searchName;
+    private String searchRoleStr;
     private Set searchRole;
 }

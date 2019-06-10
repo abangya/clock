@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author lyz
@@ -51,8 +49,9 @@ public class UserController {
 
     @RequestMapping(value = "updateUser",method = RequestMethod.POST)
     @ResponseBody
-    public Integer updateUser(@RequestBody User user){
-        return  userService.updateUser(user);
+    public Result updateUser(@RequestBody User user){
+        userService.updateUser(user);
+        return  ResultGenerator.genSuccessResult("","修改成功");
     }
 
     @GetMapping(value = "deleteUser/{id}")
@@ -71,6 +70,12 @@ public class UserController {
     @RequestMapping(value = "allUser",method = RequestMethod.POST)
     @ResponseBody
     public Result allUser(@RequestBody UserListDto userListDto){
+        System.out.println(userListDto.getSearchRole());
+        System.out.println(userListDto.getSearchRoleStr());
+        if(EmptyUtils.isNotEmpty(userListDto.getSearchRoleStr())){
+            String [] arr = userListDto.getSearchRoleStr().split(",");
+            userListDto.setSearchRole(new HashSet(Arrays.asList(arr)));
+        }
         Map<String,Object> map = new HashMap<>();
         if(EmptyUtils.isNotEmpty(userListDto.getSearchTime())){
             String[] searchTime = userListDto.getSearchTime().replace(" ","").split("~");

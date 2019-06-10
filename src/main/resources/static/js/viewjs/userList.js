@@ -1,5 +1,6 @@
+var pageCurr,userTableReload,searchTime,searchRole;
 layui.use(['table','element'], function(){
-    var table = layui.table,
+     table = layui.table,
         form = layui.form,
         element = layui.element;
         table.render({
@@ -73,6 +74,8 @@ layui.use(['table','element'], function(){
 
             })
             form.render();
+            //得到数据总量
+            pageCurr=curr;
         }
     });
     form.on('select(gender)', function(obj){
@@ -96,10 +99,10 @@ layui.use(['table','element'], function(){
     });
     //监听单元格编辑
     table.on('edit(userTableFilter)', function(obj){
-        var value = obj.value //得到修改后的值
+        /*var value = obj.value //得到修改后的值
             ,data = obj.data //得到所在行所有键值
             ,field = obj.field; //得到字段
-        layer.msg('[ID: '+ data.id +'] ' + field + ' 字段更改为：'+ value);
+        layer.msg('[ID: '+ data.id +'] ' + field + ' 字段更改为：'+ value);*/
     });
     //监听表格复选框选择
     table.on('checkbox(userTableFilter)', function(obj){
@@ -110,14 +113,16 @@ layui.use(['table','element'], function(){
     table.on('tool(userTableFilter)', function(obj){
         var data = obj.data;
         if(obj.event === 'detail'){
-            layer.msg(JSON.stringify(data))
+
         } else if(obj.event === 'del'){
             layer.confirm('真的删除行么', function(index){
                 obj.del();
                 layer.close(index);
+                layer.msg(JSON.stringify(data))
             });
         } else if(obj.event === 'edit'){
-            layer.alert('编辑行：<br>'+ JSON.stringify(data))
+            ajaxPost("/user/updateUser",data);
+            /*layer.alert('编辑行：<br>'+ JSON.stringify(data))*/
         }
     });
     var $ = layui.$, active = {
@@ -134,29 +139,19 @@ layui.use(['table','element'], function(){
         ,isAll: function(){ //验证是否全选
             var checkStatus = table.checkStatus('contenttable');
             layer.msg(checkStatus.isAll ? '全选': '未全选')
-        },reload: function(){
-            var userTableReload = $('#userTableReload');
-            var searchTime = $('#searchTime');
-            var searchRole = formSelects.value('roleSelect', 'val');
-            console.log(searchRole)
-            //执行重载
-            table.reload('userListTable', {
-                page: {
-                    curr: 1 //重新从第 1 页开始
-                }
-                ,where: {
-                    searchName: userTableReload.val(),
-                    searchTime:searchTime.val(),
-                    searchRole:searchRole
-                }
-            });
+        }
+        ,reload: function(){
+            userTableReload = $('#userTableReload');
+            searchTime = $('#searchTime');
+            pageCurr = 1;
+            load();
         }
     };
     $('.demoTable .layui-btn').on('click', function(){
         var type = $(this).data('type');
-        console.log("type"+type)
         active[type] ? active[type].call(this) : '';
     });
+
     formSelects.data('roleSelect', 'server', {
         url: '/role/roles',
         type:'get',
@@ -176,7 +171,17 @@ layui.use(['table','element'], function(){
             console.log(err);   //err对象
         }
     });
-
+    /*formSelects.on('roleSelect', function(id, vals, val, isAdd, isDisabled){
+        //id:           点击select的id
+        //vals:         当前select已选中的值
+        //val:          当前select点击的值
+        //isAdd:        当前操作选中or取消
+        //isDisabled:   当前选项是否是disabled
+        searchRole=[];
+        vals.forEach((item,index,arr) =>{
+            searchRole.push(item.value)
+        })
+    }, true);*/
 });
 layui.use('laydate', function(){
     var laydate = layui.laydate;
@@ -204,4 +209,46 @@ function show_img(t) {
         content: '<div style="text-align:center"><img src="' + $(t).attr('src') + '" /></div>'
     });
 }
+function ajaxPost(url,data) {
+  data = JSON.stringify(data);
+    $.ajax(
+        {
+        url: url,
+        type: 'POST',
+        data:data,
+        contentType:'application/json; charset=utf-8',
+        dataType : "json",
+        success: function (data) {
+            if(data.code == 200){
+                layer.msg(data.message,{
+                    time:1000
+                },function () {
+                    load()
+                })
+            }else{
+                layer.alert(data.message,function(){
+                    layer.closeAll();//关闭所有弹框
+                });
+            }
+        },
+        error: function (err) {
+            console.log(err)
+        }
+     })
+}
 
+function load(){
+    let data={
+        'searchName': userTableReload.val(),
+        'searchTime':searchTime.val(),
+        'searchRoleStr':formSelects.value('roleSelect', 'valStr')
+    }
+   /* 'searchRoleStr':formSelects.value('roleSelect', 'valStr')*/
+    //执行重载
+    table.reload('userListTable', {
+        page: {
+            curr: pageCurr //重新从第 1 页开始
+        }
+        ,where: data
+    });
+}

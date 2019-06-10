@@ -21,7 +21,7 @@
         <input class="layui-input" name="searchName" id="userTableReload" autocomplete="off">
     </div>
     <div class="layui-inline">
-        <select name="role" xm-select="roleSelect" xm-select-height="30px" xm-select-skin="default">
+        <select name="role" xm-select="roleSelect" xm-select-height="30px" xm-select-skin="primary">
             <option value="">请选择角色</option>
         </select>
     </div>
@@ -33,16 +33,16 @@
     </div>
 
     <button class="layui-btn" data-type="reload">搜索</button>
-    <div class="layui-btn-group demoTable" style="float: right">
+    <!--<div class="layui-btn-group demoTable" style="float: right">
         <button class="layui-btn" data-type="getCheckData">获取选中行数据</button>
         <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
         <button class="layui-btn" data-type="isAll">验证是否全选</button>
-    </div>
+    </div>-->
 </div>
 <table class="layui-hide" id="userTable" lay-filter="userTableFilter"></table>
 <script type="text/html" id="userTableBar">
-    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
-    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <!--<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>-->
+    <a class="layui-btn layui-btn-xs" lay-event="edit">确定修改</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
 <script type="text/html" id="genderSelect">
