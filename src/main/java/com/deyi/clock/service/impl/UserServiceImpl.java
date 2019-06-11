@@ -1,12 +1,15 @@
 package com.deyi.clock.service.impl;
 
+import com.deyi.clock.dao.UserLevelMapper;
 import com.deyi.clock.dao.UserMapper;
+import com.deyi.clock.dao.UserRoleMapper;
 import com.deyi.clock.domain.User;
 import com.deyi.clock.domain.dto.UserListDto;
 import com.deyi.clock.domain.vo.UserVo;
 import com.deyi.clock.service.UserService;
 import com.deyi.clock.utils.EmptyUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -26,6 +29,10 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private UserRoleMapper userRoleMapper;
+    @Resource
+    private UserLevelMapper userLevelMapper;
 
     @Override
     public User selectUserByName(String userName) {
@@ -38,7 +45,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Integer deleteUser(Integer id) {
+        userLevelMapper.deleteByUserId(id);
+        userRoleMapper.deleteByUserId(id);
         return userMapper.deleteUser(id);
     }
 

@@ -10,13 +10,28 @@ package com.deyi.clock.config.core;
 public class Constant {
 
     /**
-     * @title
-     * @description 状态正常
-     * @author lyz
-     * @updateTime 2019/6/3 0003 19:33
-     * @throws
+     *  状态正常
      */
-    public static final Integer STATUS_NORMAL = 1;
+    public final static Integer STATUS_NORMAL = 1;
 
+    /**
+     * 超级管理员
+     */
+    public final static String ADMIN = "admin";
+
+    /**
+     * 员工
+     */
+    public final static String USER = "user";
+
+    /**
+     * 访客
+     */
+    public final static String VISITOR = "visitor";
+
+    /**
+     * 领导
+     */
+    public final static String LEADER = "leader";
 
 }

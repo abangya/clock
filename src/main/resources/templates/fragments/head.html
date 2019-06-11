@@ -27,13 +27,11 @@
             <ul class="layui-nav layui-layout-right">
                 <li class="layui-nav-item">
                     <a href="javascript:;">
-                        <img th:src="${user.headImg}" class="layui-nav-img">
+                       <img th:src="${user.headImg}" class="layui-nav-img">
                        <label th:text="${user.realName!='' and user.realName!=null }?${user.realName}:'游客'"></label>
-
                     </a>
                     <dl class="layui-nav-child">
-                        <dd><a href="">基本资料</a></dd>
-                        <dd><a href="">安全设置</a></dd>
+                        <dd><a href="javascript:;" onclick="updateUsePwd();">修改密码</a></dd>
                     </dl>
                 </li>
                 <li class="layui-nav-item"><a href="/logout">退出</a></li>

@@ -126,10 +126,10 @@ public class ShiroRealm extends AuthorizingRealm {
         clearAllCachedAuthorizationInfo();
     }
 
-    //    public void removeUserAuthorizationInfoCache(String username) {
-//        SimplePrincipalCollection pc = new SimplePrincipalCollection();
-//        pc.add(username, super.getName());
-//        super.clearCachedAuthorizationInfo(pc);
-//    }
+    public void removeUserAuthorizationInfoCache(String username) {
+        SimplePrincipalCollection pc = new SimplePrincipalCollection();
+        pc.add(username, super.getName());
+        super.clearCachedAuthorizationInfo(pc);
+    }
 
 }

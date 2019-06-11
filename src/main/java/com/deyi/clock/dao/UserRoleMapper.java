@@ -10,8 +10,9 @@ import org.apache.ibatis.annotations.Param;
 
 public interface UserRoleMapper {
 
-    int deleteByPrimaryKey(@Param("userId") Integer userid, @Param("roleId") Integer roleid);
+    int deleteByPrimaryKey(@Param("userId") Integer userId, @Param("roleId") Integer roleId);
 
     int insertSelective(UserRole record);
 
+    int deleteByUserId(@Param("userId") Integer userId);
 }

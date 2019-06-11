@@ -7,11 +7,11 @@
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="map">
     delete from UserRole
-    where userId = #{userid,jdbcType=INTEGER}
-      and roleId = #{roleid,jdbcType=INTEGER}
+    where userId = #{userId,jdbcType=INTEGER}
+      and roleId = #{roleId,jdbcType=INTEGER}
   </delete>
   <insert id="insertSelective" parameterType="com.deyi.clock.domain.UserRole">
-    insert into UserRole
+    insert into userRole
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="userId != null">
         userId,
@@ -29,4 +29,8 @@
       </if>
     </trim>
   </insert>
+  <delete id="deleteByUserId" parameterType="Integer">
+    delete from UserRole
+    where userId = #{userId,jdbcType=INTEGER}
+  </delete>
 </mapper>

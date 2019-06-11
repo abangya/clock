@@ -1,13 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="layout :: htmlhead" th:with="title='favorites'">
-    <meta charset="UTF-8">
-</head>
+<head th:include="layout :: htmlhead" th:with="title='favorites'"></head>
+<style>
+    .layui-table, .layui-table-view {
+        margin: 0px;
+    }
+</style>
 <body>
-<div>签到统计</div>
-<div id="content"></div>
+<div class="demoTable">
+    请输入姓名：
+    <div class="layui-inline">
+        <input class="layui-input" name="userName" id="userName" autocomplete="off">
+    </div>
+    <div class="layui-inline">
+        <label class="layui-form-label">请选择范围</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="searchTime" placeholder="开始 到 结束">
+        </div>
+    </div>
+    <button class="layui-btn" data-type="reload">搜索</button>
+</div>
+<table class="layui-hide" id="checkInStatisticsTable"></table>
 
-
-</body>
+<!-- 内容主体区域 -->
+<script type="text/javascript" th:src="@{/js/dateUtils.js}"></script>
 <script type="text/javascript" th:src="@{/js/viewjs/checkInStatistics.js}"></script>
+<script type="text/javascript" th:src="@{/js/error.js}"></script>
+</body>
 </html>

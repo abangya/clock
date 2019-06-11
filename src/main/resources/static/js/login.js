@@ -27,7 +27,7 @@ function login(){
         url: '/login',
         type: 'POST',
         data:JSON.stringify($("#useLogin").serializeJSON()),
-        contentType:'application/json; charset=utf-8',
+        contentType:'application/json; charonAccessDeniedset=utf-8',
         dataType : "json",
         success: function (data) {
             if(data.code == 200){

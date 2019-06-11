@@ -2,6 +2,7 @@ package com.deyi.clock.config.shiro;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import com.deyi.clock.config.shiro.filter.KickoutSessionFilter;
+import com.deyi.clock.config.shiro.filter.ShiroLoginFilter;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
@@ -46,8 +47,9 @@ public class ShiroConfig {
     @Bean
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager){
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+        //将自定义 的ShiroFilterFactoryBean注入shiroFilter
         //这里的/login是后台的接口名,非页面，如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
-        shiroFilterFactoryBean.setLoginUrl("/notLogin");
+        //shiroFilterFactoryBean.setLoginUrl("/login");
         //这里的/index是后台的接口名,非页面,登录成功后要跳转的链接
         shiroFilterFactoryBean.setSuccessUrl("/home");
         //未授权界面,该配置无效，并不会进行页面跳转
@@ -336,7 +338,7 @@ public class ShiroConfig {
         sessionManager.setCacheManager(ehCacheManager());
 
         //全局会话超时时间（单位毫秒），默认30分钟  暂时设置为10秒钟 用来测试
-        sessionManager.setGlobalSessionTimeout(1000 * 60 *30);
+        sessionManager.setGlobalSessionTimeout(10000);
         //是否开启删除无效的session对象  默认为true
         sessionManager.setDeleteInvalidSessions(true);
         //是否开启定时调度器进行检测过期session 默认为true
@@ -390,4 +392,9 @@ public class ShiroConfig {
         hashedCredentialsMatcher.setStoredCredentialsHexEncoded(true);
         return hashedCredentialsMatcher;
     }
+    @Bean
+    public ShiroLoginFilter shiroLoginFilter(){
+        return new ShiroLoginFilter();
+    }
+
 }

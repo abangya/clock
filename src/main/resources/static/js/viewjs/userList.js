@@ -1,4 +1,4 @@
-var pageCurr,userTableReload,searchTime,searchRole;
+var pageCurr,userTableReload,searchTime;
 layui.use(['table','element'], function(){
      table = layui.table,
         form = layui.form,
@@ -62,7 +62,7 @@ layui.use(['table','element'], function(){
                     return '<div onclick="show_img(this)" ><img src="'+row.photo+'" alt="" onerror="this.style.display=\'none\'" width="50px" height="50px"></a></div>';
                 }
             },
-            {field:'lastLoginTime', width:"8%", title: '上次登录时间',align:'center'},
+            {field:'lastLoginTime', width:"10%", title: '上次登录时间',align:'center'},
             {fixed: 'right', width:"12%", align:'center', toolbar: '#userTableBar'}
         ]],
         done:function (res, curr, count) {
@@ -71,7 +71,6 @@ layui.use(['table','element'], function(){
                 if(elem.attr("name") == 'gender' || elem.attr("name") == 'role'){
                     elem.val(elem.data('value')).parents('div.layui-table-cell').css('overflow', 'visible');
                 }
-
             })
             form.render();
             //得到数据总量
@@ -106,19 +105,24 @@ layui.use(['table','element'], function(){
     });
     //监听表格复选框选择
     table.on('checkbox(userTableFilter)', function(obj){
-        console.log(obj)
+        //console.log(obj)
     });
 
     //监听工具条
     table.on('tool(userTableFilter)', function(obj){
         var data = obj.data;
         if(obj.event === 'detail'){
-
+            layer.confirm(JSON.stringify(data), {
+                btn: ['确定'] //按钮
+            }, function(index){
+                layer.close(index)
+            });
         } else if(obj.event === 'del'){
             layer.confirm('真的删除行么', function(index){
-                obj.del();
-                layer.close(index);
-                layer.msg(JSON.stringify(data))
+               /* obj.del();*/
+               /* layer.close(index);*/
+                /*layer.msg(JSON.stringify(data))*/
+                ajaxGet("/user/deleteUser",data);
             });
         } else if(obj.event === 'edit'){
             ajaxPost("/user/updateUser",data);
@@ -141,8 +145,8 @@ layui.use(['table','element'], function(){
             layer.msg(checkStatus.isAll ? '全选': '未全选')
         }
         ,reload: function(){
-            userTableReload = $('#userTableReload');
-            searchTime = $('#searchTime');
+            userTableReload = $('#userTableReload').val();
+            searchTime = $('#searchTime').val();
             pageCurr = 1;
             load();
         }
@@ -220,10 +224,9 @@ function ajaxPost(url,data) {
         dataType : "json",
         success: function (data) {
             if(data.code == 200){
+                load();
                 layer.msg(data.message,{
                     time:1000
-                },function () {
-                    load()
                 })
             }else{
                 layer.alert(data.message,function(){
@@ -236,11 +239,32 @@ function ajaxPost(url,data) {
         }
      })
 }
-
+function ajaxGet(url,data) {
+    $.ajax(
+        {
+            url: url+'/'+data.id,
+            type: 'Get',
+            //data:data,
+            contentType:'application/json; charset=utf-8',
+            dataType : "json",
+            success: function (data) {
+                if(data.code == 200){
+                    load()
+                    layer.msg(data.message,{
+                        time:1000
+                    })
+                }else{
+                    layer.alert(data.message,function(){
+                        layer.closeAll();//关闭所有弹框
+                    });
+                }
+            }
+        })
+}
 function load(){
     let data={
-        'searchName': userTableReload.val(),
-        'searchTime':searchTime.val(),
+        'searchName': userTableReload,
+        'searchTime':searchTime,
         'searchRoleStr':formSelects.value('roleSelect', 'valStr')
     }
    /* 'searchRoleStr':formSelects.value('roleSelect', 'valStr')*/

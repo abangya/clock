@@ -23,4 +23,5 @@ public interface ClockService {
     List<Map<String,Object>> levelClock(Integer userId);
 
     Integer clockAllUserCount(ClockDto clockDto);
+
 }

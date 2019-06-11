@@ -15,4 +15,6 @@ public interface UserRoleService {
     int deleteByPrimaryKey(Integer userId,Integer roleId);
 
     int insertSelective(UserRole record);
+
+    int deleteByUserId(Integer userId);
 }

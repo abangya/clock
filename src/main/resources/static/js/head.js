@@ -63,8 +63,6 @@ function getParentArry(id, arry) {
     return newArry;
 }
 
-
-
 function updateUsePwd(){
     layer.open({
         type:1,
@@ -72,7 +70,7 @@ function updateUsePwd(){
         fixed:false,
         resize :false,
         shadeClose: true,
-        area: ['450px'],
+        area: ['400px'],
         content:$('#pwdDiv')
     });
 }
