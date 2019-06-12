@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.deyi.clock.dao.CheckInStatisticsMapper">
+    <select id="getAllUserList" resultType="java.util.Map">
+        select
+            c.id,u.realName name,c.createTime,c.image,c.ipAddress,l.levelId
+        from
+            clock c
+        left join
+            user u
+        on c.photo = u.photo
+        left join
+            userlevel l
+        on
+            u.id = l.userId
+        where
+            DATE_FORMAT(c.createTime,'%Y-%m-%d' )=DATE_SUB(CURDATE(),INTERVAL 2 DAY)
+        group by
+             c.name,c.createTime,c.image
+        order by
+             c.createTime
+    </select>
+
+    <select id="getDimensionList" resultType="java.util.Map">
+        select
+            startTime,endTime,parentId,sort
+        from
+            dimension
+        group by
+            parentId,startTime,endTime
+        order by
+            parentId,sort
+    </select>
+
+    <select id="getList" resultType="java.util.Map">
+        select
+            name,
+            sum(checkInTimes)  checkInTimes,
+            sum(actualCheckInTimes) actualCheckInTimes,
+            sum(normal) normal,
+            sum(late) late,
+            sum(leaveEarly) leaveEarly,
+            sum(unsignedTimes) unsignedTimes
+        from
+          dayCount
+        where
+          countDate
+        between
+          DATE_SUB(CURDATE(),INTERVAL WEEKDAY(CURDATE()) DAY)
+        and
+          DATE_ADD(CURDATE(),INTERVAL (6-WEEKDAY(CURDATE())) DAY)
+        group by
+          name
+    </select>
+
+
+    <insert id="addDayCount" parameterType="java.util.List">
+        insert into dayCount(
+          name,
+          countDate,
+          checkInTimes,
+          actualCheckInTimes,
+          normal,
+          late,
+          leaveEarly,
+          unsignedTimes)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.name},
+            DATE_SUB(CURDATE(),INTERVAL 1 DAY),
+            #{item.checkInTimes},
+            #{item.actualCheckInTimes},
+            #{item.normal},
+            #{item.late},
+            #{item.leaveEarly},
+            #{item.unsigned})
+        </foreach>
+    </insert>
+</mapper>
