@@ -2,7 +2,6 @@ package com.deyi.clock.service.impl;
 
 import com.deyi.clock.dao.CheckInStatisticsMapper;
 import com.deyi.clock.service.CheckInStatisticsService;
-import com.deyi.clock.utils.DateUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -20,8 +19,12 @@ public class CheckInStatisticsServiceImpl extends BaseService implements CheckIn
         return cisMapper.getstatisticsList();
     }
 
-    public List<Map<String,Object>> getList(){
-        return cisMapper.getList();
+    public List<Map<String,Object>> getListOfWeek(){
+        return cisMapper.getListOfWeek();
+    }
+
+    public List<Map<String,Object>> getListOfMonth(){
+        return cisMapper.getListOfMonth();
     }
 
 

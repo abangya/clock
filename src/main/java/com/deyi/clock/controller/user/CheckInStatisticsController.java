@@ -4,12 +4,8 @@ import com.deyi.clock.config.core.Result;
 import com.deyi.clock.config.core.ResultGenerator;
 import com.deyi.clock.service.CheckInStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 签到统计controller
@@ -26,9 +22,14 @@ public class CheckInStatisticsController {
         return i;
     }
 
-    @GetMapping("getStatistics")
+    @GetMapping("getListOfWeek")
     public Result getStatistics(){
-        return ResultGenerator.genSuccessResult(cisService.getList());
+        return ResultGenerator.genSuccessResult(cisService.getListOfWeek());
+    }
+
+    @GetMapping("getListOfMonth")
+    public Result getListOfMonth(){
+        return ResultGenerator.genSuccessResult(cisService.getListOfMonth());
     }
 
 }

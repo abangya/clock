@@ -9,5 +9,7 @@ public interface CheckInStatisticsService {
 
     public int dayCount();
 
-    public List<Map<String,Object>> getList();
+    public List<Map<String,Object>> getListOfWeek();
+
+    public List<Map<String,Object>> getListOfMonth();
 }

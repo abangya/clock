@@ -32,7 +32,7 @@
             parentId,sort
     </select>
 
-    <select id="getList" resultType="java.util.Map">
+    <select id="getListOfWeek" resultType="java.util.Map">
         select
             name,
             sum(checkInTimes)  checkInTimes,
@@ -53,6 +53,26 @@
           name
     </select>
 
+    <select id="getListOfMonth" resultType="java.util.Map">
+        select
+            name,
+            sum(checkInTimes)  checkInTimes,
+            sum(actualCheckInTimes) actualCheckInTimes,
+            sum(normal) normal,
+            sum(late) late,
+            sum(leaveEarly) leaveEarly,
+            sum(unsignedTimes) unsignedTimes
+        from
+          dayCount
+        where
+          countDate
+        between
+          DATE_FORMAT(CURDATE(),"%Y-%m-01")
+        and
+          LAST_DAY(CURDATE())
+        group by
+          name
+    </select>
 
     <insert id="addDayCount" parameterType="java.util.List">
         insert into dayCount(
