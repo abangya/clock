@@ -39,8 +39,8 @@ layui.use(['table','element'], function(){
                     return DateUtils.dateFormat("yyyy-MM-dd",new Date(row.clockCreateTime));
                 }
             },
-            {field:'userName', width:"8%", title: '用户名',align:'center'},
-            {field:'level', width:"8%", title: '打卡次数',align:'center'},
+            {field:'realName', width:"8%", title: '用户名',align:'center'},
+            {field:'describe', width:"8%", title: '打卡标准',align:'center'},
             {field:'time', width:"45%", title: '考核区间',
                 templet:function (row) {
                     var str = '';
@@ -71,7 +71,7 @@ layui.use(['table','element'], function(){
                     layer.open({
                         type: 1,
                         anim: 0,
-                        title: data.userName+"打卡记录",
+                        title: data.realName+"打卡记录",
                         area: ['60%', '60%'],
                         btn: ['关闭'],
                         content: "<div style='height: 100%;'><table id=\"templateTable\"></table></div>",
@@ -158,7 +158,7 @@ layui.use(['table','element'], function(){
                     curr: 1 //重新从第 1 页开始
                 }
                 ,where: {
-                    userName: demoReload.val(),
+                    realName: demoReload.val(),
                     searchTime:searchTime.val()
                 }
             });

@@ -36,8 +36,8 @@ public class ClockServiceImpl implements ClockService {
        }
         List<ClockVo> page =clockMapper.clockAllUser(clockDto);
         for (ClockVo map:page) {
-            if(EmptyUtils.isEmpty(map.getUserName())){
-                map.setUserName(map.getClockName());
+            if(EmptyUtils.isEmpty(map.getRealName())){
+                map.setRealName(map.getClockName());
             }
         }
         return page;

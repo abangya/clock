@@ -24,11 +24,12 @@ public class ClockVo implements Serializable {
     private String clockIpAddress;
     private String clockName;
     private int id;
-    private String userName;
+    private String realName;
     private int age;
     private String photo;
     private Integer clId;
     private Integer level;
+    private String describe;
     private List<DimensionVo> dimensionVoList;
 
 }

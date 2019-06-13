@@ -2,6 +2,8 @@ package com.deyi.clock.service.impl;
 
 import com.deyi.clock.dao.CheckInStatisticsMapper;
 import com.deyi.clock.service.CheckInStatisticsService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -19,17 +21,24 @@ public class CheckInStatisticsServiceImpl extends BaseService implements CheckIn
         return cisMapper.getstatisticsList();
     }
 
-    public List<Map<String,Object>> getListOfWeek(){
-        return cisMapper.getListOfWeek();
+    public PageInfo<Map<String, Object>> getListOfWeek(Map<String,Object> map){
+        PageHelper.startPage((Integer) map.get("startNum"), (Integer) map.get("size"));
+        PageInfo<Map<String, Object>> page = new PageInfo<>(cisMapper.getListOfWeek(map));
+        return page;
     }
 
-    public List<Map<String,Object>> getListOfMonth(){
-        return cisMapper.getListOfMonth();
+    public  PageInfo<Map<String, Object>> getListOfMonth(Map<String, Object> map){
+        PageHelper.startPage((Integer) map.get("startNum"), (Integer) map.get("size"));
+        PageInfo<Map<String, Object>> page = new PageInfo<>(cisMapper.getListOfMonth(map));
+        return page;
     }
 
-
-
-
+    @Override
+    public PageInfo<Map<String, Object>> getListOfDay(Map<String,Object> map){
+        PageHelper.startPage((Integer) map.get("startNum"), (Integer) map.get("size"));
+        PageInfo<Map<String, Object>> page = new PageInfo<>(cisMapper.getListOfDay(map));
+        return page;
+    }
 
     /**
      *
@@ -41,7 +50,7 @@ public class CheckInStatisticsServiceImpl extends BaseService implements CheckIn
         //这里已经排序过了，打卡记录时间从早到晚
         /*
          * 返回数据
-         *  c.id,c.name,c.createTime,c.image,c.ipAddress,l.levelId
+         *  c.id,c.name,c.createTime,c.image,c.ipAddress,l.level
          */
         List<Map<String,Object>> userList = cisMapper.getAllUserList();//源数据
         PLATFORM_LOGGER.info("userList:" + userList.toString());
@@ -81,8 +90,8 @@ public class CheckInStatisticsServiceImpl extends BaseService implements CheckIn
          */
         List<Map<String, Object>> handleList = recordHandle(userList, sortLevelMap, countMap);
         //4.将统计结果存入数据库
+        PLATFORM_LOGGER.info("end--CheckInStatisticsServiceImpl---dayCount,return:{}",handleList);
         int result = cisMapper.addDayCount(handleList);
-        PLATFORM_LOGGER.info("end--CheckInStatisticsServiceImpl---dayCount,return:");
         return result;
     }
 
@@ -113,7 +122,6 @@ public class CheckInStatisticsServiceImpl extends BaseService implements CheckIn
             try {
                 String time = format.format((Date) currentRec.get("createTime"));
                 createTime = format.parse(time);
-                System.out.println("104行："+ time+"，"+createTime.getTime());
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -131,6 +139,7 @@ public class CheckInStatisticsServiceImpl extends BaseService implements CheckIn
                 cUser.put("leaveEarly",0);                  //早退
                 cUser.put("unsigned",level*2);             //未签到
                 cUser.put("checkInFlag",checkInFlag);       //每个区间的上、下班签到的情况，奇数为上班卡，偶数为下班卡，0为未打卡，1为正常打卡，2为异常（即迟到或早退）
+                cUser.put("userId",currentRec.get("userId"));//对应的userID
             }
             PLATFORM_LOGGER.info("createTime:"+createTime);
             for (int j=0;j<level;){//循环每一个区间

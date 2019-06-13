@@ -13,7 +13,9 @@ public interface CheckInStatisticsMapper {
 
     public int addDayCount(List<Map<String,Object>> mapList);
 
-    public List<Map<String,Object>> getListOfWeek();
+    public List<Map<String,Object>> getListOfWeek(Map<String,Object> map);
 
-    public List<Map<String,Object>> getListOfMonth();
+    public List<Map<String,Object>> getListOfMonth(Map<String,Object> map);
+
+    public List<Map<String,Object>> getListOfDay(Map<String,Object> map);
 }

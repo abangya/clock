@@ -40,7 +40,55 @@
                 userName,
             </if>
             <if test="age != null">
-                age
+                age,
+            </if>
+            <if test="photo != null">
+                photo,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="realName != null">
+                realName,
+            </if>
+            <if test="headImg != null">
+                headImg,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="gender != null">
+                gender,
+            </if>
+            <if test="createTime != null">
+                createTime,
+            </if>
+            <if test="updateTime != null">
+                updateTime,
+            </if>
+            <if test="createUser != null">
+                createUser,
+            </if>
+            <if test="updateUser != null">
+                updateUser,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="registerIp != null">
+                registerIp,
+            </if>
+            <if test="lastLoginTime != null">
+                lastLoginTime,
+            </if>
+            <if test="salt != null">
+                salt,
+            </if>
+            <if test="tel != null">
+                tel,
+            </if>
+            <if test="nickName != null">
+                nickName
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -51,7 +99,55 @@
                 #{userName,jdbcType=VARCHAR},
             </if>
             <if test="age != null">
-                #{age,jdbcType=INTEGER}
+                #{age,jdbcType=INTEGER},
+            </if>
+            <if test="photo != null">
+                #{photo,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="realName != null">
+                #{realName,jdbcType=VARCHAR},
+            </if>
+            <if test="headImg != null">
+                #{headImg,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="gender != null">
+                #{gender,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUser != null">
+                #{createUser,jdbcType=INTEGER},
+            </if>
+            <if test="updateUser != null">
+                #{updateUser,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="registerIp != null">
+                #{registerIp,jdbcType=VARCHAR},
+            </if>
+            <if test="lastLoginTime != null">
+                #{lastLoginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="salt != null">
+                #{salt,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null">
+                #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="nickName != null">
+                #{nickName,jdbcType=VARCHAR}
             </if>
         </trim>
     </insert>

@@ -1,14 +1,17 @@
-layui.use(['table','element'], function(){
+layui.use(['table','element','jquery'], function(){
     var table = layui.table;
+    $= layui.$;
     table.render({
         id:'checkInStatisticsTableID'
         ,elem: '#checkInStatisticsTable'
-        ,url:'/clock/clockAllUser'
-        ,method:"post"
+        ,url:'/checkInStatistics/getDayCountList'
+        ,method:"get"
         ,height: 'full-40'
-        ,contentType: 'application/json'
         ,limit:20
         ,page:true
+        ,where : {
+            'type':$('#typeRadio input[name="type"]:checked').val()
+        }
         ,request: {
             pageName: 'startNum' //页码的参数名称，默认：page
             ,limitName: 'size' //每页数据量的参数名，默认：limit
@@ -30,33 +33,36 @@ layui.use(['table','element'], function(){
         }
         ,cols: [[
             {type:'numbers',title:'序号'},
-            {field:'userName', title: '姓名',align:'center'},
-            {field:'level',title: '打卡次数',align:'center'},
-            {field:'level',title: '迟到次数',align:'center'},
-            {field:'level',title: '早退次数',align:'center'},
-            {field:'time',title: '考核区间',
+            {field:'name', title: '姓名',align:'center'},
+            {field:'countDate',title: '打卡日期',align:'center',
                 templet:function (row) {
-                    var str = '';
-                    for(var i = 0 ;i<row.dimensionVoList.length;i++){
-                        str+= row.dimensionVoList[i].startTime+"-"+row.dimensionVoList[i].endTime+"  ";
+                    if(row.countDate){
+                        return row.countDate;
                     }
-                    return str;
-                }},
-
+                    return row.startTime +' -  '+row.endTime;
+                }
+            },
+            {field:'checkInTimes',title: '应打卡次数',align:'center'},
+            {field:'actualCheckInTimes',title: '实际打卡次数',align:'center'},
+            {field:'normal',title: '正常打卡次数',align:'center'},
+            {field:'late',title: '迟到次数',align:'center'},
+            {field:'leaveEarly',title: '早退次数',align:'center'},
+            {field:'unsignedTimes',title: '缺卡次数',align:'center'}
         ]]
     });
     var $ = layui.$, active = {
         reload: function(){
-            var userName = $('#userName');
+            var name = $('#name');
             var searchTime = $('#searchTime');
             //执行重载
-            table.reload('contenttable', {
+            table.reload('checkInStatisticsTableID', {
                 page: {
                     curr: 1 //重新从第 1 页开始
                 }
                 ,where: {
-                    userName: userName.val(),
-                    searchTime:searchTime.val()
+                    name: name.val(),
+                    //searchTime:searchTime.val(),
+                    'type':$('#typeRadio input[name="type"]:checked').val()
                 }
             });
         }

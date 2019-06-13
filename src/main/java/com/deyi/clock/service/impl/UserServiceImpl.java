@@ -1,5 +1,7 @@
 package com.deyi.clock.service.impl;
 
+import com.deyi.clock.config.core.Result;
+import com.deyi.clock.config.core.ResultGenerator;
 import com.deyi.clock.dao.UserLevelMapper;
 import com.deyi.clock.dao.UserMapper;
 import com.deyi.clock.dao.UserRoleMapper;
@@ -8,14 +10,12 @@ import com.deyi.clock.domain.dto.UserListDto;
 import com.deyi.clock.domain.vo.UserVo;
 import com.deyi.clock.service.UserService;
 import com.deyi.clock.utils.EmptyUtils;
+import com.deyi.clock.utils.Md5Utils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author lyz
@@ -40,8 +40,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Integer insertUser(User user) {
-        return userMapper.insertUser(user);
+    public Result insertUser(User user) {
+        if(EmptyUtils.isEmpty(user.getPassword())){
+            user.setPassword("123456");
+        }
+        String[] arr = Md5Utils.md5(user.getPassword(),user.getUserName());
+        user.setPassword(arr[1]);
+        user.setSalt(arr[0]);
+        user.setCreateTime(new Date());
+        int i = userMapper.insertUser(user);
+        if(i==0){
+            return ResultGenerator.genFailResult("添加失败");
+        }else{
+            return ResultGenerator.genFailResult("添加失败");
+        }
     }
 
     @Override

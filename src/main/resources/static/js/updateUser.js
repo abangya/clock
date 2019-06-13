@@ -8,11 +8,6 @@ $(function(){
             password: function(value) {
                 if (value === "")
                     return "密码不能为空！";
-               /* var regExpDigital = /\d/; //如果有数字
-                var regExpLetters = /[a-zA-Z]/; //如果有字母
-                if (!(regExpDigital.test(value) && regExpLetters.test(value) && value.length >= 8)) {
-                    return '密码必须包含英文和数字！';
-                }*/
             },
             isPassword: function(value) {
                 if (value === ""){
@@ -42,23 +37,16 @@ function setPwd(){
         contentType:'application/x-www-form-urlencoded',
         dataType : "json",
         success: function (data) {
-
-        },
-        error: function (err) {
-            console.log(err)
+            if(data.code==200){
+                layer.alert("操作成功",function () {
+                    layer.closeAll();
+                    window.location.href="/logout";
+                });
+            }else{
+                layer.alert(data.message,function () {
+                    layer.closeAll();
+                });
+            }
         }
     })
-   /* $.post("/user/setPwd",{"password":pwd,"isPassword":isPwd},function(data){
-        console.log("data:"+data);
-        if(data.code=="1"){
-            layer.alert("操作成功",function () {
-                layer.closeAll();
-                window.location.href="/logout";
-            });
-        }else{
-            layer.alert(data.message,function () {
-                layer.closeAll();
-            });
-        }
-    });*/
 }

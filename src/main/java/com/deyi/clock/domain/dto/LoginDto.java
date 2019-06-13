@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @throws 
  */
 @Data
-public class LoginDTO implements Serializable {
+public class LoginDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

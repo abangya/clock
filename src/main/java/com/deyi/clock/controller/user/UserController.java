@@ -4,23 +4,20 @@ import com.deyi.clock.config.core.Result;
 import com.deyi.clock.config.core.ResultGenerator;
 import com.deyi.clock.controller.BaseController;
 import com.deyi.clock.domain.User;
-import com.deyi.clock.domain.dto.LoginDTO;
 import com.deyi.clock.domain.dto.UserListDto;
 import com.deyi.clock.domain.vo.UserVo;
 import com.deyi.clock.service.UserService;
 import com.deyi.clock.utils.EmptyUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.*;
+
+import static com.deyi.clock.utils.Md5Utils.md5;
 
 /**
  * @author lyz
@@ -36,18 +33,6 @@ public class UserController extends BaseController {
     @Resource
     private UserService userService;
 
-    @RequestMapping(value = "find/{userName}",method = RequestMethod.GET)
-    @ResponseBody
-    public Result findUser(@PathVariable(value = "userName",required = false)String userName){
-        System.out.println(userName);
-        return  ResultGenerator.genSuccessResult(userService.selectUserByName(userName));
-    }
-
-    @RequestMapping(value = "insertUser",method = RequestMethod.POST)
-    @ResponseBody
-    public Integer insertUser(@RequestBody User user){
-        return  userService.insertUser(user);
-    }
 
     @RequestMapping(value = "updateUser",method = RequestMethod.POST)
     @ResponseBody
@@ -56,6 +41,15 @@ public class UserController extends BaseController {
         return  ResultGenerator.genSuccessResult("","修改成功");
     }
 
+    /**
+     * @title deleteUser
+     * @description 删除用户
+     * @author lyz
+     * @param: id
+     * @updateTime 2019/6/12 0012 11:11
+     * @return: com.deyi.clock.config.core.Result
+     * @throws
+     */
     @RequiresRoles(value = {"admin"},logical = Logical.OR)
     @GetMapping(value = "deleteUser/{id}")
     @ResponseBody
@@ -64,6 +58,15 @@ public class UserController extends BaseController {
         return ResultGenerator.genSuccessResult( userService.deleteUser(id),"删除成功!");
     }
 
+    /**
+     * @title allUser
+     * @description 全部用户
+     * @author lyz
+     * @param: userListDto
+     * @updateTime 2019/6/12 0012 11:11
+     * @return: com.deyi.clock.config.core.Result
+     * @throws
+     */
     @RequestMapping(value = "allUser",method = RequestMethod.POST)
     @ResponseBody
     public Result allUser(@RequestBody UserListDto userListDto){
@@ -82,27 +85,60 @@ public class UserController extends BaseController {
         map.put("list",userVoList);
         return  ResultGenerator.genSuccessResult(map);
     }
+
     /**
-     * 功能描述: 修改密码
+     * @title setP
+     * @description 修改密码
+     * @author lyz
+     * @param: password
+     * @updateTime 2019/6/12 0012 11:11
+     * @return: com.deyi.clock.config.core.Result
+     * @throws
      */
     @RequestMapping("setPwd")
     @ResponseBody
     public Result setP(@RequestParam String password){
+        Date date = new Date();
         platformLogger.info(password);
         //获取当前登陆的用户信息
         User user = (User) SecurityUtils.getSubject().getPrincipal();
-        platformLogger.info("进行密码重置{}",user);
-       /* int result = userService.updatePwd(user.getSysUserName(),pwd);
-        if(result == 0){
-            data.put("code",0);
-            data.put("msg","修改密码失败！");
-            logger.error("用户修改密码失败！");
-            return data;
+        User userTemp = userService.selectUserByName(user.getUserName());
+        if(EmptyUtils.isEmpty(userTemp)){
+            return ResultGenerator.genFailResult("该用户不存在");
         }
-        data.put("code",1);
-        data.put("msg","修改密码成功！");
-        logger.info("用户修改密码成功！");*/
-        return ResultGenerator.genSuccessResult();
+        String[] arr = md5(password,user.getUserName());
+        userTemp.setSalt(arr[0]);
+        userTemp.setPassword(arr[1]);
+        userTemp.setUpdateTime(date);
+        userTemp.setUpdateUser(user.getId());
+        int result = userService.updateUser(userTemp);
+        if(result == 0){
+            platformLogger.error("用户修改密码失败！");
+            return ResultGenerator.genFailResult("修改密码失败！");
+        }
+
+        platformLogger.info("用户修改密码成功！");
+        return ResultGenerator.genSuccessResult("","修改密码成功！");
     }
 
+    /**
+     * @title setUser
+     * @description 新增或修改用户
+     * @author lyz
+     * @param: user
+     * @updateTime 2019/6/12 0012 11:10
+     * @return: com.deyi.clock.config.core.Result
+     * @throws
+     */
+    @RequestMapping(value = "/setUser", method = RequestMethod.POST)
+    @ResponseBody
+    public Result setUser(@RequestBody User user) {
+        platformLogger.info("设置用户[新增或更新]！user:{}",user);
+        if(user.getId() == null){
+           userService.insertUser(user);
+        }else{
+           userService.updateUser(user);
+        }
+        return ResultGenerator.genSuccessResult(null,"操作成功");
+    }
 }

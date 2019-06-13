@@ -3,7 +3,7 @@
 <mapper namespace="com.deyi.clock.dao.CheckInStatisticsMapper">
     <select id="getAllUserList" resultType="java.util.Map">
         select
-            c.id,u.realName name,c.createTime,c.image,c.ipAddress,l.levelId
+            c.id,u.realName name,c.createTime,c.image,c.ipAddress,u.id userId,l.levelId
         from
             clock c
         left join
@@ -14,7 +14,7 @@
         on
             u.id = l.userId
         where
-            DATE_FORMAT(c.createTime,'%Y-%m-%d' )=DATE_SUB(CURDATE(),INTERVAL 2 DAY)
+            DATE_FORMAT(c.createTime,'%Y-%m-%d' )=DATE_SUB(CURDATE(),INTERVAL 1 DAY)
         group by
              c.name,c.createTime,c.image
         order by
@@ -31,10 +31,30 @@
         order by
             parentId,sort
     </select>
-
-    <select id="getListOfWeek" resultType="java.util.Map">
+    <select id="getListOfDay" resultType="java.util.Map" parameterType="HashMap">
+        select
+            *
+        from
+            dayCount
+        <where>
+            <if test="startTime != null &amp;&amp; startTime!='' ">
+                and DATE_FORMAT(countDate,'%Y-%m-%d') >= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null &amp;&amp; endTime!='' ">
+                and DATE_FORMAT(countDate,'%Y-%m-%d') &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="name != null &amp;&amp; name!='' ">
+                and name like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
+        order by
+            countDate desc
+    </select>
+    <select id="getListOfWeek" resultType="java.util.Map" parameterType="HashMap">
         select
             name,
+            DATE_SUB(CURDATE(),INTERVAL WEEKDAY(CURDATE()) DAY) startTime,
+            DATE_ADD(CURDATE(),INTERVAL (6-WEEKDAY(CURDATE())) DAY) endTime,
             sum(checkInTimes)  checkInTimes,
             sum(actualCheckInTimes) actualCheckInTimes,
             sum(normal) normal,
@@ -43,19 +63,27 @@
             sum(unsignedTimes) unsignedTimes
         from
           dayCount
-        where
-          countDate
-        between
-          DATE_SUB(CURDATE(),INTERVAL WEEKDAY(CURDATE()) DAY)
-        and
-          DATE_ADD(CURDATE(),INTERVAL (6-WEEKDAY(CURDATE())) DAY)
+        <where>
+            countDate
+                between
+                     DATE_SUB(CURDATE(),INTERVAL WEEKDAY(CURDATE()) DAY)
+                and
+                    DATE_ADD(CURDATE(),INTERVAL (6-WEEKDAY(CURDATE())) DAY)
+            <if test="name != null &amp;&amp; name!='' ">
+                and name like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
         group by
-          name
+            name
+        order by
+            countDate desc
     </select>
 
-    <select id="getListOfMonth" resultType="java.util.Map">
+    <select id="getListOfMonth" resultType="java.util.Map" parameterType="HashMap">
         select
             name,
+            DATE_FORMAT(CURDATE(),"%Y-%m-01") startTime,
+            LAST_DAY(CURDATE()) endTime,
             sum(checkInTimes)  checkInTimes,
             sum(actualCheckInTimes) actualCheckInTimes,
             sum(normal) normal,
@@ -64,18 +92,25 @@
             sum(unsignedTimes) unsignedTimes
         from
           dayCount
-        where
-          countDate
-        between
-          DATE_FORMAT(CURDATE(),"%Y-%m-01")
-        and
-          LAST_DAY(CURDATE())
+        <where>
+                countDate
+            between
+                DATE_FORMAT(CURDATE(),"%Y-%m-01")
+            and
+                LAST_DAY(CURDATE())
+            <if test="name != null &amp;&amp; name!='' ">
+                and name like CONCAT('%',#{name,jdbcType=VARCHAR},'%')
+            </if>
+        </where>
         group by
           name
+        order by
+            countDate desc
     </select>
 
     <insert id="addDayCount" parameterType="java.util.List">
         insert into dayCount(
+          userId,
           name,
           countDate,
           checkInTimes,
@@ -86,14 +121,17 @@
           unsignedTimes)
         values
         <foreach collection="list" item="item" separator=",">
-            (#{item.name},
+            (
+            #{item.userId},
+            #{item.name},
             DATE_SUB(CURDATE(),INTERVAL 1 DAY),
             #{item.checkInTimes},
             #{item.actualCheckInTimes},
             #{item.normal},
             #{item.late},
             #{item.leaveEarly},
-            #{item.unsigned})
+            #{item.unsigned}
+            )
         </foreach>
     </insert>
 </mapper>

@@ -1,7 +1,7 @@
-var pageCurr,userTableReload,searchTime;
-layui.use(['table','element'], function(){
-     table = layui.table,
-        form = layui.form,
+var pageCurr,userTableReload,searchTime,table;
+layui.use(['table','element','form'], function(){
+        table = layui.table;
+        var form = layui.form,
         element = layui.element;
         table.render({
         id:'userListTable'
@@ -77,6 +77,7 @@ layui.use(['table','element'], function(){
             pageCurr=curr;
         }
     });
+     //监听下拉框
     form.on('select(gender)', function(obj){
         var elem = $(obj.elem);
         var trElem = elem.parents('tr');
@@ -93,7 +94,6 @@ layui.use(['table','element'], function(){
         if(obj.elem.checked){
             str = 1;
         }
-        layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
         tableData[trElem.data('index')][elem.attr('name')] = str;
     });
     //监听单元格编辑
@@ -129,19 +129,20 @@ layui.use(['table','element'], function(){
             /*layer.alert('编辑行：<br>'+ JSON.stringify(data))*/
         }
     });
+    //监听button按钮点击事件
     var $ = layui.$, active = {
         getCheckData: function(){ //获取选中数据
-            var checkStatus = table.checkStatus('contenttable')
+            var checkStatus = table.checkStatus('userListTable')
                 ,data = checkStatus.data;
             layer.alert(JSON.stringify(data));
         }
         ,getCheckLength: function(){ //获取选中数目
-            var checkStatus = table.checkStatus('contenttable')
+            var checkStatus = table.checkStatus('userListTable')
                 ,data = checkStatus.data;
             layer.msg('选中了：'+ data.length + ' 个');
         }
         ,isAll: function(){ //验证是否全选
-            var checkStatus = table.checkStatus('contenttable');
+            var checkStatus = table.checkStatus('userListTable');
             layer.msg(checkStatus.isAll ? '全选': '未全选')
         }
         ,reload: function(){
@@ -155,7 +156,7 @@ layui.use(['table','element'], function(){
         var type = $(this).data('type');
         active[type] ? active[type].call(this) : '';
     });
-
+    //渲染多选下拉框
     formSelects.data('roleSelect', 'server', {
         url: '/role/roles',
         type:'get',
@@ -175,28 +176,79 @@ layui.use(['table','element'], function(){
             console.log(err);   //err对象
         }
     });
-    /*formSelects.on('roleSelect', function(id, vals, val, isAdd, isDisabled){
-        //id:           点击select的id
-        //vals:         当前select已选中的值
-        //val:          当前select点击的值
-        //isAdd:        当前操作选中or取消
-        //isDisabled:   当前选项是否是disabled
-        searchRole=[];
-        vals.forEach((item,index,arr) =>{
-            searchRole.push(item.value)
-        })
-    }, true);*/
 });
-layui.use('laydate', function(){
-    var laydate = layui.laydate;
+//日期下拉框组件
+layui.use(['laydate','form','upload'], function(){
+    var form = layui.form,
+        laydate = layui.laydate,
+        upload = layui.upload;
     //执行一个laydate实例
     laydate.render({
         elem: '#searchTime', //指定元素
         type: 'date',
         range: '~'
     });
+    //监听提交
+    form.on('submit(userSubmit)', function(data){
+        // TODO 校验
+        if(data.field.status == "on") {
+            data.field.status = "1";
+        } else {
+            data.field.status = "0";
+        }
+        formSubmit(data);
+        return false;
+    });
+    //执行实例
+    var uploadInst = upload.render({
+        elem: '#photoId' //绑定元素
+        ,url: '/imageUpload/' //上传接口
+         ,before: function(obj){
+             //预读本地文件示例，不支持ie8
+             obj.preview(function(index, file, result){
+                 $('#demo1').attr('src', result); //图片链接（base64）
+             });
+         }
+         ,done: function(res){
+             //如果上传失败
+             if(res.code !=200){
+                 return layer.msg('上传失败');
+             }
+             //上传成功
+            debugger;
+            $("input[name='file']").val()
+         }
+         ,error: function(){
+             //演示失败状态，并实现重传
+             var demoText = $('#demoText');
+             demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+             demoText.find('.demo-reload').on('click', function(){
+                 uploadInst.upload();
+             });
+         }
+    });
 });
-
+//提交表单
+function formSubmit(data){
+    console.log(JSON.stringify(data.field))
+    $.ajax({
+        type: "POST",
+        contentType:'application/json; charset=utf-8',
+        dataType : "json",
+        data: JSON.stringify(data.field),
+        url: "/user/setUser",
+        success: function (data) {
+            if (data.code == 200) {
+                layer.alert(data.message,function(){
+                    layer.closeAll();
+                    load();
+                });
+            } else {
+                layer.alert(data.message);
+            }
+        }
+    });
+}
 //显示大图片
 function show_img(t) {
     var t = $(t).find("img");
@@ -240,34 +292,32 @@ function ajaxPost(url,data) {
      })
 }
 function ajaxGet(url,data) {
-    $.ajax(
-        {
-            url: url+'/'+data.id,
-            type: 'Get',
-            //data:data,
-            contentType:'application/json; charset=utf-8',
-            dataType : "json",
-            success: function (data) {
-                if(data.code == 200){
-                    load()
-                    layer.msg(data.message,{
-                        time:1000
-                    })
-                }else{
-                    layer.alert(data.message,function(){
-                        layer.closeAll();//关闭所有弹框
-                    });
-                }
+    $.ajax({
+        url: url+'/'+data.id,
+        type: 'Get',
+        contentType:'application/json; charset=utf-8',
+        dataType : "json",
+        success: function (data) {
+            if(data.code == 200){
+                load()
+                layer.msg(data.message,{
+                    time:1000
+                })
+            }else{
+                layer.alert(data.message,function(){
+                    layer.closeAll();//关闭所有弹框
+                });
             }
-        })
+        }
+    })
 }
+//重新加载表格
 function load(){
     let data={
         'searchName': userTableReload,
         'searchTime':searchTime,
         'searchRoleStr':formSelects.value('roleSelect', 'valStr')
     }
-   /* 'searchRoleStr':formSelects.value('roleSelect', 'valStr')*/
     //执行重载
     table.reload('userListTable', {
         page: {
@@ -275,4 +325,48 @@ function load(){
         }
         ,where: data
     });
+}
+function addUser() {
+    openUser(null,"新增用户");
+}
+function openUser(data,title) {
+    if(data==null || data==""){
+        $("#id").val("");
+    }
+    formSelects.data('formRoleSelect', 'server', {
+        url: '/role/roles',
+        type:'get',
+        response: {
+            statusCode: 200,          //成功状态码
+            statusName: 'code',     //code key
+            msgName: 'message',         //msg key
+            dataName: 'data'        //data key
+        },
+        keyName: 'name',            //自定义返回数据中name的key, 默认 name
+        keyVal: 'value',
+        success: function(id, url, searchVal, result){      //使用远程方式的success回调
+            console.log(result);    //返回的结果
+        },
+        error: function(id, url, searchVal, err){           //使用远程方式的error回调
+            console.log(err);   //err对象
+        }
+    });
+    layer.open({
+        type:1,
+        title: title,
+        fixed:false,
+        resize :false,
+        shadeClose: true,
+        area: ['550px'],
+        content:$('#setUser'),
+        end:function(){
+            cleanUser();
+        }
+    });
+}
+function cleanUser(){
+    $("#userName").val("");
+    $("#tel").val("");
+    $("#password").val("");
+    $('#roleId').html("");
 }

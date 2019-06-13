@@ -3,16 +3,13 @@ package com.deyi.clock.controller;
 import com.deyi.clock.config.core.Result;
 import com.deyi.clock.config.core.ResultGenerator;
 import com.deyi.clock.domain.User;
-import com.deyi.clock.domain.dto.LoginDTO;
-import com.deyi.clock.utils.EmptyUtils;
+import com.deyi.clock.domain.dto.LoginDto;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -80,7 +77,7 @@ public class IndexController extends BaseController {
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
-    public Result login(HttpServletRequest request, @RequestBody LoginDTO loginDTO, HttpSession session, Model model) {
+    public Result login(HttpServletRequest request, @RequestBody LoginDto loginDTO, HttpSession session, Model model) {
         platformLogger.info("登录操作{}",loginDTO.toString());
         boolean flag = false;
         if (null != loginDTO.getRememberMe() && loginDTO.getRememberMe().equals("on")) {

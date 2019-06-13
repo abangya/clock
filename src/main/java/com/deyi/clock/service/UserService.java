@@ -1,5 +1,6 @@
 package com.deyi.clock.service;
 
+import com.deyi.clock.config.core.Result;
 import com.deyi.clock.domain.User;
 import com.deyi.clock.domain.dto.UserListDto;
 import com.deyi.clock.domain.vo.UserVo;
@@ -18,7 +19,7 @@ public interface UserService {
 
     User selectUserByName(String userName);
 
-    Integer insertUser(User user);
+    Result insertUser(User user);
 
     Integer deleteUser(Integer id);
 

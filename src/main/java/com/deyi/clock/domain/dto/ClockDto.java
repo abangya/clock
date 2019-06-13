@@ -15,6 +15,6 @@ import java.io.Serializable;
 public class ClockDto extends BaseDto implements Serializable{
     private static final long serialVersionUID = 1L;
     private int id;
-    private String userName;
+    private String realName;
 
 }
