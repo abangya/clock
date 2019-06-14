@@ -33,4 +33,17 @@
     delete from UserRole
     where userId = #{userId,jdbcType=INTEGER}
   </delete>
+  <insert id="addRoles" parameterType="java.util.List">
+    insert into userRole(
+    userId,
+    roleId
+   )
+    values
+    <foreach collection="list" item="item" separator=",">
+      (
+      #{item.userId},
+      #{item.roleId}
+      )
+    </foreach>
+  </insert>
 </mapper>

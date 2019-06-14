@@ -6,6 +6,7 @@ import com.deyi.clock.service.UserRoleService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author lyz
@@ -34,5 +35,10 @@ public class UserRoleServiceImpl implements UserRoleService {
     @Override
     public int deleteByUserId(Integer userId) {
         return userRoleMapper.deleteByUserId(userId);
+    }
+
+    @Override
+    public int addRoles(List<UserRole> userRoleList) {
+        return userRoleMapper.addRoles(userRoleList);
     }
 }

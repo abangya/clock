@@ -58,7 +58,7 @@
 
 <!--添加或编辑用户-->
 <div id="setUser" class="layer_self_wrap" style="width:500px;display:none;">
-    <form id="userForm" class="layui-form layui-form-pane" method="post" action="" style="margin-top: 20px;">
+    <form id="userForm" class="layui-form layui-form-pane" method="post" action="" style="margin-top: 20px;" lay-filter="userForm">
         <input id="id" type="hidden" name="id"/>
         <div class="layui-form-item">
             <label class="layui-form-label">用户名</label>
@@ -67,6 +67,12 @@
             </div>
         </div>
         <div class="layui-form-item">
+            <label class="layui-form-label">真实姓名</label>
+                <div class="layui-input-inline">
+                    <input id="realName" name="realName" lay-verify="required" autocomplete="off" class="layui-input" type="text"/>
+                </div>
+        </div>
+        <div class="layui-form-item" id="pwd">
             <label class="layui-form-label">密码</label>
             <div class="layui-input-inline">
                 <input id="password" name="password" autocomplete="off" class="layui-input" type="password" placeholder="默认初始密码：123456" />
@@ -91,14 +97,14 @@
         <div class="layui-form-item">
             <label class="layui-form-label">状态</label>
             <div class="layui-input-block">
-                <input type="checkbox" name="status" lay-skin="switch" lay-text="开启|冻结">
+                <input type="checkbox" name="status" lay-skin="switch" lay-text="开启|冻结" checked="checked">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">性别</label>
             <div class="layui-input-block">
-                <input type="radio" name="gender" value="1" title="男">
-                <input type="radio" name="gender" value="2" title="女" checked>
+                <input type="radio" name="gender" value="1" title="男" checked>
+                <input type="radio" name="gender" value="2" title="女">
             </div>
         </div>
         <div class="layui-form-item">
@@ -106,8 +112,9 @@
             <div class="layui-input-block">
                 <div class="layui-upload">
                     <button type="button" class="layui-btn" id="photoId">上传图片</button>
-                    <div class="layui-upload-list" style="display: inline">
-                        <img class="layui-upload-img" id="demo1" style="width: 38px;height: 38px;">
+                    <div class="layui-upload-list" style="display: inline" onclick="show_img(this)">
+                        <input id="photo" type="hidden" name="photo"/>
+                        <img class="layui-upload-img" id="demo1" style="width: 38px;height: 38px;display: none" onerror="this.style.display='none'">
                         <p id="demoText"></p>
                     </div>
                 </div>

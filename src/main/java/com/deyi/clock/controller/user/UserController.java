@@ -4,6 +4,7 @@ import com.deyi.clock.config.core.Result;
 import com.deyi.clock.config.core.ResultGenerator;
 import com.deyi.clock.controller.BaseController;
 import com.deyi.clock.domain.User;
+import com.deyi.clock.domain.dto.UserDto;
 import com.deyi.clock.domain.dto.UserListDto;
 import com.deyi.clock.domain.vo.UserVo;
 import com.deyi.clock.service.UserService;
@@ -132,13 +133,14 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/setUser", method = RequestMethod.POST)
     @ResponseBody
-    public Result setUser(@RequestBody User user) {
+    public Result setUser(@RequestBody UserDto user) {
+        Result result = new Result();
         platformLogger.info("设置用户[新增或更新]！user:{}",user);
-        if(user.getId() == null){
-           userService.insertUser(user);
+        if(user.getUser().getId() == null){
+            result = userService.insertUser(user);
         }else{
-           userService.updateUser(user);
+            result = userService.updateUser(user);
         }
-        return ResultGenerator.genSuccessResult(null,"操作成功");
+        return result;
     }
 }

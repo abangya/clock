@@ -3,6 +3,8 @@ package com.deyi.clock.service;
 import com.deyi.clock.domain.UserRole;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author lyz
  * @version 1.0.0
@@ -17,4 +19,6 @@ public interface UserRoleService {
     int insertSelective(UserRole record);
 
     int deleteByUserId(Integer userId);
+
+    int addRoles(List<UserRole> userRoleList);
 }

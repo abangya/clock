@@ -38,4 +38,9 @@ public class ViewController extends BaseController{
         platformLogger.info("跳转首页");
         return "fragments/content";
     }
+    @RequestMapping("/roleList")
+    public String roleList() {
+        platformLogger.info("跳转角色列表页");
+        return "views/roleList";
+    }
 }

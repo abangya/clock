@@ -2,6 +2,7 @@ package com.deyi.clock.service.impl;
 
 import com.deyi.clock.dao.CheckInStatisticsMapper;
 import com.deyi.clock.service.CheckInStatisticsService;
+import com.deyi.clock.utils.EmptyUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
@@ -91,7 +92,10 @@ public class CheckInStatisticsServiceImpl extends BaseService implements CheckIn
         List<Map<String, Object>> handleList = recordHandle(userList, sortLevelMap, countMap);
         //4.将统计结果存入数据库
         PLATFORM_LOGGER.info("end--CheckInStatisticsServiceImpl---dayCount,return:{}",handleList);
-        int result = cisMapper.addDayCount(handleList);
+        int result=0;
+        if(handleList.size()>0){
+             result = cisMapper.addDayCount(handleList);
+        }
         return result;
     }
 
@@ -113,6 +117,9 @@ public class CheckInStatisticsServiceImpl extends BaseService implements CheckIn
          */
         for (int i=0;i<userList.size();i++){//循环每一条打卡记录
             Map<String,Object> currentRec = userList.get(i);
+            if(EmptyUtils.isEmpty(currentRec.get("levelId"))){
+                continue;
+            }
             String levelId = Integer.toString((int)currentRec.get("levelId"));//打卡等级
             List<Map<String,Object>> listLevel = sortLevelMap.get(levelId);    //打卡区间的时间集合
             int level = sortLevelMap.get(levelId).size();                      //打卡等级的区间数
@@ -187,6 +194,7 @@ public class CheckInStatisticsServiceImpl extends BaseService implements CheckIn
                         ((int[])cUser.get("checkInFlag"))[j*2+1] = 2;
                         break;
                     }
+                    break;
                     //当前区间有上班卡，也有下班卡，替换前一个下班时间，但是仍然是早退
                     //TODO 因为这里不需要对时间做保存，所以暂时认为不需要做任何操作
                     //说明是比当前区间晚

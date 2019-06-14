@@ -45,11 +45,6 @@ spring:
           statement-close-after-log-enabled: false
           result-set-open-after-log-enabled: false
           result-set-close-after-log-enabled: false
-  devtools:
-    restart:
-      enabled: true
-      exclude: static/**
-      additional-paths: src/main/java
   thymeleaf:
     mode: HTML5
     encoding: UTF-8
@@ -71,4 +66,5 @@ multipart:
   maxRequestSize: 50Mb
 # 自定义文件上传路径
 web:
+  #\\192.168.100.28\gongxiang
   upload-path: D:/DeYi/Photos/

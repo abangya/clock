@@ -28,7 +28,6 @@ public class FileUtils {
 
         //确定上传的文件名
         String realPath = path + "\\" + fileName;
-        System.out.println("上传文件：" + realPath);
         File dest = new File(realPath);
         //判断文件父目录是否存在
         if (!dest.getParentFile().exists()) {

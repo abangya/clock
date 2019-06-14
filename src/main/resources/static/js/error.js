@@ -29,7 +29,6 @@ function ajaxError(){
 $(function(){
 	$.ajaxSetup({
 		error: function(jqXHR, textStatus, errorThrown) {
-			console.log(jqXHR)
 			//$.messager.show({title: '提示信息',msg: '<center style="color:red">网络异常，请稍后再试</center>',timeout: 2000,showType: 'slide'});
             switch(jqXHR.status) {
               case(500):

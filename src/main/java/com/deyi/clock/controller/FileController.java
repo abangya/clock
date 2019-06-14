@@ -52,7 +52,7 @@ public class FileController {
                     System.out.println(fileName);
                     //文件存放的相对路径(一般存放在数据库用于img标签的src)
                     String relativePath = path + fileName;
-                    root.put("relativePath", relativePath);//前端根据是否存在该字段来判断上传是否成功
+                    root.put("relativePath", "/image/"+fileName);//前端根据是否存在该字段来判断上传是否成功
                     result_msg = "图片上传成功";
                 } else {
                     result_msg = "图片上传失败";

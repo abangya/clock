@@ -30,7 +30,7 @@
         SELECT * FROM user WHERE userName = #{userName}
     </select>
     <!--动态添加-->
-    <insert id="insertUser" parameterType="User" keyProperty="id" useGeneratedKeys="true">
+    <insert id="insertUser" parameterType="User" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
         insert into user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -230,6 +230,7 @@
                 and realName like CONCAT('%',#{searchName,jdbcType=VARCHAR},'%')
             </if>
         </where>
+        order by createTime desc
         limit #{startNum},#{size}
         ) u
         LEFT JOIN userRole ur on u.id = ur.userId
@@ -244,6 +245,7 @@
                 </foreach>
             </if>
         </where>
+        order by u.createTime desc
     </select>
 
     <!--分页查询数量-->

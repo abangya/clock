@@ -1,16 +1,21 @@
 package com.deyi.clock.service.impl;
 
+import com.deyi.clock.config.core.Constant;
 import com.deyi.clock.config.core.Result;
 import com.deyi.clock.config.core.ResultGenerator;
 import com.deyi.clock.dao.UserLevelMapper;
 import com.deyi.clock.dao.UserMapper;
 import com.deyi.clock.dao.UserRoleMapper;
 import com.deyi.clock.domain.User;
+import com.deyi.clock.domain.UserRole;
+import com.deyi.clock.domain.dto.UserDto;
 import com.deyi.clock.domain.dto.UserListDto;
 import com.deyi.clock.domain.vo.UserVo;
 import com.deyi.clock.service.UserService;
 import com.deyi.clock.utils.EmptyUtils;
 import com.deyi.clock.utils.Md5Utils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,17 +45,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result insertUser(User user) {
+    @Transactional
+    public Result insertUser(UserDto userDto) {
+        User user = userDto.getUser();
         if(EmptyUtils.isEmpty(user.getPassword())){
-            user.setPassword("123456");
+            user.setPassword("123456");//初始密码
         }
         String[] arr = Md5Utils.md5(user.getPassword(),user.getUserName());
         user.setPassword(arr[1]);
         user.setSalt(arr[0]);
         user.setCreateTime(new Date());
+        user.setCreateUser(((User)SecurityUtils.getSubject().getPrincipal()).getId());
         int i = userMapper.insertUser(user);
-        if(i==0){
-            return ResultGenerator.genFailResult("添加失败");
+        int r=0;
+        if(EmptyUtils.isNotEmpty(userDto.getRoleId())){
+            List<UserRole> userRoleList = new ArrayList<>();
+            String[] roles = userDto.getRoleId().split(",");
+            for (String str:roles) {
+                UserRole userRole = new UserRole();
+                userRole.setUserId(user.getId());
+                userRole.setRoleId(Integer.valueOf(str));
+                userRoleList.add(userRole);
+            }
+            r = userRoleMapper.addRoles(userRoleList);
+        }else{
+            UserRole userRole = new UserRole();
+            userRole.setUserId(user.getId());
+            userRole.setRoleId(3);
+            r = userRoleMapper.insertSelective(userRole);
+        }
+        if(i>0 && r>0){
+            return ResultGenerator.genSuccessResult("","添加成功");
         }else{
             return ResultGenerator.genFailResult("添加失败");
         }
@@ -62,6 +87,32 @@ public class UserServiceImpl implements UserService {
         userLevelMapper.deleteByUserId(id);
         userRoleMapper.deleteByUserId(id);
         return userMapper.deleteUser(id);
+    }
+
+    @Override
+    @Transactional
+    public Result updateUser(UserDto userDto) {
+        User user = userDto.getUser();
+        user.setUpdateTime(new Date());
+        user.setUpdateUser(((User)SecurityUtils.getSubject().getPrincipal()).getId());
+        int i = userMapper.updateUser(user);
+        userRoleMapper.deleteByUserId(user.getId());
+        if(EmptyUtils.isNotEmpty(userDto.getRoleId())){
+            List<UserRole> userRoleList = new ArrayList<>();
+            String[] roles = userDto.getRoleId().split(",");
+            for (String str:roles) {
+                UserRole userRole = new UserRole();
+                userRole.setRoleId(Integer.valueOf(str));
+                userRole.setUserId(user.getId());
+                userRoleList.add(userRole);
+            }
+            userRoleMapper.addRoles(userRoleList);
+        }
+        if(i>0){
+            return ResultGenerator.genSuccessResult("","修改成功");
+        }else{
+            return ResultGenerator.genFailResult("修改失败");
+        }
     }
 
     @Override

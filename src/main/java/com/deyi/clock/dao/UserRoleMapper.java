@@ -8,6 +8,8 @@ package com.deyi.clock.dao;
 import com.deyi.clock.domain.UserRole;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface UserRoleMapper {
 
     int deleteByPrimaryKey(@Param("userId") Integer userId, @Param("roleId") Integer roleId);
@@ -15,4 +17,6 @@ public interface UserRoleMapper {
     int insertSelective(UserRole record);
 
     int deleteByUserId(@Param("userId") Integer userId);
+
+    int addRoles(List<UserRole> userRoleList);
 }

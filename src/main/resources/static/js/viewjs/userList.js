@@ -1,7 +1,7 @@
 var pageCurr,userTableReload,searchTime,table;
 layui.use(['table','element','form'], function(){
         table = layui.table;
-        var form = layui.form,
+        form = layui.form,
         element = layui.element;
         table.render({
         id:'userListTable'
@@ -54,12 +54,12 @@ layui.use(['table','element','form'], function(){
             {field:'status', title:'状态', width:"6%", align:'center',templet: '#status'},
             {field:'headImg', width:"8%", title: '头像',align:'center',
                 templet:function (row) {
-                    return '<div onclick="show_img(this)" ><img src="'+row.headImg+'" alt="" onerror="this.style.display=\'none\'" width="50px" height="50px"></a></div>';
+                    return '<div onclick="show_img(this)" ><img src="'+row.headImg+'" alt="" onerror="this.style.display=\'none\'" width="50px" height="50px"></div>';
                 }
             },
             {field:'photo', width:"8%", title: '绑定照片',align:'center',
                 templet:function (row) {
-                    return '<div onclick="show_img(this)" ><img src="'+row.photo+'" alt="" onerror="this.style.display=\'none\'" width="50px" height="50px"></a></div>';
+                    return '<div onclick="show_img(this)" ><img src="'+row.photo+'" alt="" onerror="this.style.display=\'none\'" width="50px" height="50px"></div>';
                 }
             },
             {field:'lastLoginTime', width:"10%", title: '上次登录时间',align:'center'},
@@ -112,11 +112,7 @@ layui.use(['table','element','form'], function(){
     table.on('tool(userTableFilter)', function(obj){
         var data = obj.data;
         if(obj.event === 'detail'){
-            layer.confirm(JSON.stringify(data), {
-                btn: ['确定'] //按钮
-            }, function(index){
-                layer.close(index)
-            });
+            openUser(data,'编辑')
         } else if(obj.event === 'del'){
             layer.confirm('真的删除行么', function(index){
                /* obj.del();*/
@@ -169,7 +165,7 @@ layui.use(['table','element','form'], function(){
         keyName: 'name',            //自定义返回数据中name的key, 默认 name
         keyVal: 'value',
         success: function(id, url, searchVal, result){      //使用远程方式的success回调
-            console.log(result);    //返回的结果
+            //console.log(result);    //返回的结果
         },
         error: function(id, url, searchVal, err){           //使用远程方式的error回调
             //同上
@@ -194,7 +190,7 @@ layui.use(['laydate','form','upload'], function(){
         if(data.field.status == "on") {
             data.field.status = "1";
         } else {
-            data.field.status = "0";
+            data.field.status = "2";
         }
         formSubmit(data);
         return false;
@@ -206,7 +202,8 @@ layui.use(['laydate','form','upload'], function(){
          ,before: function(obj){
              //预读本地文件示例，不支持ie8
              obj.preview(function(index, file, result){
-                 $('#demo1').attr('src', result); //图片链接（base64）
+                 $('#demo1').show();
+                 $('#demo1').attr('src', result);
              });
          }
          ,done: function(res){
@@ -215,8 +212,8 @@ layui.use(['laydate','form','upload'], function(){
                  return layer.msg('上传失败');
              }
              //上传成功
-            debugger;
-            $("input[name='file']").val()
+
+            $('#photo').val(res.data.relativePath);
          }
          ,error: function(){
              //演示失败状态，并实现重传
@@ -230,12 +227,16 @@ layui.use(['laydate','form','upload'], function(){
 });
 //提交表单
 function formSubmit(data){
-    console.log(JSON.stringify(data.field))
+    var dataTemp={
+        user:data.field,
+        roleId:data.field.roleId
+
+    }
     $.ajax({
         type: "POST",
         contentType:'application/json; charset=utf-8',
         dataType : "json",
-        data: JSON.stringify(data.field),
+        data: JSON.stringify(dataTemp),
         url: "/user/setUser",
         success: function (data) {
             if (data.code == 200) {
@@ -257,7 +258,7 @@ function show_img(t) {
         title:'图片详情',
         type: 1,
         skin: 'layui-layer-rim', //加上边框
-        area: ['40%', '50%'], //宽高
+        area: ['50%', '60%'], //宽高
         shadeClose: true, //开启遮罩关闭
         end: function (index, layero) {
             return false;
@@ -332,6 +333,30 @@ function addUser() {
 function openUser(data,title) {
     if(data==null || data==""){
         $("#id").val("");
+        $("#pwd").show();
+        $("input[name='userName']").removeAttr("disabled");
+    }else{
+        $("#pwd").hide();
+        $("input[name='userName']").attr("disabled","disabled");
+        //表单初始赋值
+        form.val('userForm', {
+             "userName": data.userName
+            ,"realName": data.realName
+            ,"password": data.password
+            ,"tel": data.tel
+            ,"status": data.status==1?true:false
+            ,"gender": data.gender+''
+            ,"id":data.id
+
+        })
+        if(data.photo){
+            $('#demo1').show();
+            $('#demo1').attr('src', data.photo);
+        }
+        var arr=[];
+        for(let i of data.userRoleVoList){
+            arr.push(i.roleId)
+        }
     }
     formSelects.data('formRoleSelect', 'server', {
         url: '/role/roles',
@@ -345,10 +370,10 @@ function openUser(data,title) {
         keyName: 'name',            //自定义返回数据中name的key, 默认 name
         keyVal: 'value',
         success: function(id, url, searchVal, result){      //使用远程方式的success回调
-            console.log(result);    //返回的结果
+                formSelects.value('formRoleSelect',arr)
         },
         error: function(id, url, searchVal, err){           //使用远程方式的error回调
-            console.log(err);   //err对象
+            layer.msg(err.responseJSON.msg);
         }
     });
     layer.open({
@@ -356,7 +381,7 @@ function openUser(data,title) {
         title: title,
         fixed:false,
         resize :false,
-        shadeClose: true,
+        shadeClose: false,
         area: ['550px'],
         content:$('#setUser'),
         end:function(){
@@ -366,7 +391,8 @@ function openUser(data,title) {
 }
 function cleanUser(){
     $("#userName").val("");
+    $("#realName").val("");
     $("#tel").val("");
     $("#password").val("");
-    $('#roleId').html("");
+    $('#demo1').hide();
 }
