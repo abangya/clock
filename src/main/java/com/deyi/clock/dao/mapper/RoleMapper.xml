@@ -82,5 +82,15 @@
   <!-- 查询用户信息 -->
   <select id="findRolesByUserId" resultType="Role">
         SELECT r.* from role r LEFT JOIN userRole ur on r.id = ur.roleId where ur.userId  = #{userId} order by sort
-    </select>
+  </select>
+  <select id="roleList" resultType="Role">
+    select
+        *
+    from
+        role
+    where
+        state = 1
+    order by
+        sort
+  </select>
 </mapper>

@@ -2,11 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="layout :: htmlhead" th:with="title='favorites'"></head>
 <body>
-
-
+<table id="roleList" lay-filter="roleList"></table>
 
 <script type="text/javascript" th:src="@{/js/dateUtils.js}"></script>
-<script type="text/javascript" th:src="@{/js/viewjs/roleLost.js}"></script>
+<script type="text/javascript" th:src="@{/js/viewjs/roleList.js}"></script>
 <script type="text/javascript" th:src="@{/js/error.js}"></script>
 </body>
 </html>

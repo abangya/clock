@@ -263,7 +263,7 @@ function show_img(t) {
         end: function (index, layero) {
             return false;
         },
-        content: '<div style="text-align:center"><img src="' + $(t).attr('src') + '" /></div>'
+        content: '<div style="text-align:center;width: 100%;height: 100%;"><img src="' + $(t).attr('src') + '" style="width: 100%;height: 100%;" /></div>'
     });
 }
 function ajaxPost(url,data) {

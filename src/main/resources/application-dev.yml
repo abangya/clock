@@ -66,5 +66,7 @@ multipart:
   maxRequestSize: 50Mb
 # 自定义文件上传路径
 web:
-  #\\192.168.100.28\gongxiang
-  upload-path: D:/DeYi/Photos/
+  #\\192.168.100.28\gongxiang\dl_recog_cs\data\data_pic
+  #D:/DeYi/Photos/
+  upload-path: \\192.168.100.28\gongxiang\dl_recog_cs\data\data_pic\
+  path-mapping: /image/

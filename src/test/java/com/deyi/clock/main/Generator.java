@@ -3,11 +3,11 @@ package com.deyi.clock.main;
 import org.mybatis.generator.api.ShellRunner;
 
 public class Generator {
-    public static void main(String[] args) {
+  /*  public static void main(String[] args) {
         args = new String[] { "-configfile", "src\\test\\resources\\generator\\generatorConfig.xml", "-overwrite" };
         ShellRunner.main(args);
 
-    }
+    }*/
 
 //      这两个main方法都可以执行生成JavaEntity不过喜欢上面那个简洁的方法
 //	public static void main(String[] args) throws Exception {

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,11 +27,12 @@ import java.util.UUID;
  * @createTime 2019年06月13日 14:19
  */
 @RestController
-public class FileController {
+public class FileController extends BaseController{
 
     @Value("${web.upload-path}")
     private String path;
-
+    @Value("${web.path-mapping}")
+    private String pathMapping;
 
     @PostMapping("/imageUpload")
     public Result imageUpload(@RequestParam("file") MultipartFile file) {
@@ -46,13 +48,16 @@ public class FileController {
                 String fileName = file.getOriginalFilename();
                 //获取文件后缀名
                 String suffixName = fileName.substring(fileName.lastIndexOf("."));
+                int maxNum = FileUtils.fileNameMaxList(path);
+                fileName = "Person_" + maxNum;
                 //重新生成文件名
-                fileName = UUIDUtils.getUUID() + suffixName;
+                fileName = fileName + suffixName;
+                //fileName = UUIDUtils.getUUID() + suffixName;
                 if (FileUtils.upload(file, path, fileName)) {
-                    System.out.println(fileName);
                     //文件存放的相对路径(一般存放在数据库用于img标签的src)
                     String relativePath = path + fileName;
-                    root.put("relativePath", "/image/"+fileName);//前端根据是否存在该字段来判断上传是否成功
+                    platformLogger.info("路径：{}",relativePath);
+                    root.put("relativePath", pathMapping+fileName);//前端根据是否存在该字段来判断上传是否成功
                     result_msg = "图片上传成功";
                 } else {
                     result_msg = "图片上传失败";

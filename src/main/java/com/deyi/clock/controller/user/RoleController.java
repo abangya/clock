@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lyz
@@ -33,5 +37,10 @@ public class RoleController extends BaseController {
         return ResultGenerator.genSuccessResult(roleService.roles());
     }
 
+    @GetMapping("roleList")
+    @ResponseBody
+    public Result roleList(){
+        return ResultGenerator.genSuccessResult(roleService.roleList());
+    }
 
 }

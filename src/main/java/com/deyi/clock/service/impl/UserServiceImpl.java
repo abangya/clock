@@ -13,9 +13,11 @@ import com.deyi.clock.domain.dto.UserListDto;
 import com.deyi.clock.domain.vo.UserVo;
 import com.deyi.clock.service.UserService;
 import com.deyi.clock.utils.EmptyUtils;
+import com.deyi.clock.utils.FileUtils;
 import com.deyi.clock.utils.Md5Utils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,10 @@ import java.util.*;
 @Service
 public class UserServiceImpl implements UserService {
 
+    @Value("${web.path-mapping}")
+    private String pathMapping;
+    @Value("${web.upload-path}")
+    private String path;
     @Resource
     private UserMapper userMapper;
     @Resource
@@ -42,6 +48,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User selectUserByName(String userName) {
         return userMapper.selectUserByName(userName);
+    }
+
+    @Override
+    public User selectUserById(Integer id) {
+        return userMapper.selectUserById(id);
     }
 
     @Override
@@ -84,9 +95,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Integer deleteUser(Integer id) {
+        User user = userMapper.selectUserById(id);
+        user.setPhoto(user.getPhoto().replace(pathMapping,path));
+        int flag =  userMapper.deleteUser(id);
+        if(flag>0){
+            FileUtils.deleteFile(user.getPhoto());
+        }
         userLevelMapper.deleteByUserId(id);
         userRoleMapper.deleteByUserId(id);
-        return userMapper.deleteUser(id);
+        return flag;
     }
 
     @Override

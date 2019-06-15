@@ -24,4 +24,6 @@ public interface RoleMapper {
     Set<Role> findRolesByUserId(@Param("userId") Integer userId);
 
     List<Role> roles();
+
+    List<Role> roleList();
 }

@@ -20,11 +20,14 @@ public interface UserService {
 
     User selectUserByName(String userName);
 
+    User selectUserById(Integer id);
+
     Result insertUser(UserDto user);
 
     Integer deleteUser(Integer id);
 
     Result updateUser(UserDto user);
+
     Integer updateUser(User user);
 
     List<UserVo> allUser(UserListDto userListDto);

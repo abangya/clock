@@ -29,6 +29,9 @@
     <select id="selectUserByName"  resultType="User">
         SELECT * FROM user WHERE userName = #{userName}
     </select>
+    <select id="selectUserById"  resultType="User">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
     <!--动态添加-->
     <insert id="insertUser" parameterType="User" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
         insert into user

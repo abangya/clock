@@ -21,4 +21,6 @@ public interface RoleService {
     int updateByPrimaryKeySelective(Role record);
 
     List<Role> roles();
+
+    List<Role> roleList();
 }
